@@ -11,10 +11,10 @@ class AudioPlayer private constructor() {
         val INSTANCE: AudioPlayer by lazy(mode = LazyThreadSafetyMode.SYNCHRONIZED) {
             AudioPlayer()
         }
-        val STATUS_IDLE = 0;
-        val STATUS_PREPARING = 1
-        val STATUS_PLAYING = 2
-        val STATUS_PAUSE = 3
+        const val STATUS_IDLE = 0
+        const val STATUS_PREPARING = 1
+        const val STATUS_PLAYING = 2
+        const val STATUS_PAUSE = 3
     }
 
     private lateinit var mContext: Context
@@ -26,6 +26,20 @@ class AudioPlayer private constructor() {
         get() = state == STATUS_PREPARING
     private val isPause: Boolean
         get() = state == STATUS_PAUSE
+    private val isPlaying: Boolean
+        get() = state == STATUS_PLAYING
+    private val isIdle: Boolean
+        get() = state == STATUS_IDLE
+    private val position: Int
+        get() {
+            //TODO Preference获取
+            return 0
+        }
+    private val currentMusic: Music
+        get() = mMusicList[position]
+    private val audioPositon: Int
+        get() = if (isPause || isPlaying)  mMediaPlayer.currentPosition else 0
+
 
     fun init(context: Context) {
         mContext = context.applicationContext
@@ -65,10 +79,15 @@ class AudioPlayer private constructor() {
     }
 
     fun playOrPause() {
-
+        when {
+            isPreparing -> stopPlayer()
+            isPlaying -> pausePlayer()
+            isPause -> startPlayer()
+            else -> play(position)
+        }
     }
 
-    fun startPlayer() {
+    private fun startPlayer() {
         if (!isPreparing && !isPause) {
             return
         }
@@ -77,13 +96,49 @@ class AudioPlayer private constructor() {
 
     }
 
-    fun pausePlayer() {}
-    fun stopPlayer() {}
-    fun next() {}
-    fun pre() {}
-    fun playNextOrPre(next: Boolean) {}
-    fun seekTo(msec: Int) {}
+    private fun pausePlayer() {
+        if (!isPlaying) {
+            return
+        }
+        mMediaPlayer.pause()
+        state = STATUS_PAUSE
+    }
+
+    private fun stopPlayer() {
+        if (isIdle) {
+            return
+        }
+        pausePlayer()
+        mMediaPlayer.stop()
+        state = STATUS_IDLE
+    }
+
+    fun next() {
+        playNextOrPre(false)
+    }
+
+    fun pre() {
+        playNextOrPre(true)
+    }
+    fun playNextOrPre(next: Boolean) {
+        if (mMusicList.isEmpty()) {
+            return
+        }
+
+    }
+    fun seekTo(msec: Int) {
+        if (isPlaying || isPause || isIdle) {
+            if (isIdle) {
+                play(position)
+            }
+            mMediaPlayer.seekTo(msec)
+        }
+    }
+
     fun setMode() {}
 
+    private val runnable = Runnable{
+
+    }
 
 }
