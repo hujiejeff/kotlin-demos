@@ -1,3 +1,26 @@
 <resources>
     <string name="app_name">MusicPlayer</string>
+    <string name="setting">设置</string>
+    <string name="about">关于</string>
+    <string name="example_date">22 12月，周日</string>
+    <string name="example_hello">hello</string>
+    <string name="tab_music">音乐</string>
+    <string name="tab_album">专辑</string>
+    <string name="tab_artist">歌手</string>
+    <string name="example_music">异邦人</string>
+    <string name="example_artist">久保田早纪</string>
+    <string name="default_album_title">异邦人</string>
+
+    <string name="drawer_open">open</string>
+    <string name="drawer_close">close</string>
+    <string name="search">查找</string>
+    <string name="equilizer">均衡器</string>
+    <string name="random_play">随机播放全部</string>>
+    <string name="example_time">0:33</string>
+    <string name="example_movie_title">消声克的救赎</string>
+    <string name="button_refresh">刷新</string>
+    <string name="movie_activity">文件夹</string>
+    <string name="refresh">刷新</string>
+    <string name="play_online_movie">网络串流</string>
+    <string name="check">查看</string>
 </resources>
