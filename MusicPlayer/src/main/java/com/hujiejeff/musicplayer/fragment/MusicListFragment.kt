@@ -32,7 +32,7 @@ class MusicListFragment : BaseFragment() {
                     AudioPlayer.INSTANCE.play(it)
                 }
             }
-            layoutManager = LinearLayoutManager(context, RecyclerView.VERTICAL, true)
+            layoutManager = LinearLayoutManager(context, RecyclerView.VERTICAL, false)
             itemAnimator = DefaultItemAnimator()
         }
     }

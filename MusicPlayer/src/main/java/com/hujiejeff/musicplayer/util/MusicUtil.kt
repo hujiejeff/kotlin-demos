@@ -80,7 +80,7 @@ fun getAlbumList(): List<Album> {
     return albumList
 }
 
-fun getArtisList(): List<Artist> {
+fun getArtistList(): List<Artist> {
     val artistList = mutableListOf<Artist>()
     val cursor = queryAll(artistUri, arrayOf(ARTIST, _ID)) ?: return artistList
     while (cursor.moveToNext()) {
@@ -108,6 +108,9 @@ fun getCover(albumID: Long): Bitmap {
     }
     return BitmapFactory.decodeResource(App.appContext.resources, R.drawable.default_cover)
 }
+
+fun getArtistCover() = BitmapFactory.decodeResource(App.appContext.resources,R.drawable.default_artist_art)
+
 
 fun queryAll(uri: Uri, projection: Array<String>): Cursor? = App.appContext.contentResolver.query(
     uri, projection, null, null, null

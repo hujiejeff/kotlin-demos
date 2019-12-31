@@ -16,7 +16,15 @@ class App : Application() {
         super.onCreate()
         logD("App onCreate")
         appContext = applicationContext
+        //TODO 不能在这里请求contentprovider，要权限
         AudioPlayer.INSTANCE.init(appContext)
         Preference.init(this)
+    }
+
+    fun todo() {
+        //TODO 封面加载缓存问题
+        //TODO 懒加载
+        //TODO 状态栏
+        //TODO 播放页面viewpager
     }
 }

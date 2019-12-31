@@ -23,4 +23,5 @@
     <string name="refresh">刷新</string>
     <string name="play_online_movie">网络串流</string>
     <string name="check">查看</string>
+    <string name="again_back_press">再次按返回退出</string>
 </resources>

@@ -7,6 +7,7 @@ import android.os.Handler
 import android.os.Looper
 import androidx.core.os.postDelayed
 import com.hujiejeff.musicplayer.OnPlayerEventListener
+import com.hujiejeff.musicplayer.component.Notifier
 import com.hujiejeff.musicplayer.entity.Music
 import com.hujiejeff.musicplayer.entity.PlayMode
 import com.hujiejeff.musicplayer.storage.Preference
@@ -90,7 +91,8 @@ class AudioPlayer private constructor() {
             }
         }
         Preference.play_position = position
-        //TODO 通知
+        //通知
+        Notifier.getInstance().showPlay(music)
     }
 
     fun playOrPause() {
@@ -98,7 +100,10 @@ class AudioPlayer private constructor() {
             isPreparing -> stopPlayer()
             isPlaying -> pausePlayer()
             isPause -> startPlayer()
-            else -> play(position)
+            else -> {
+                play(position)
+                isResume = true
+            }
         }
     }
 
@@ -119,7 +124,7 @@ class AudioPlayer private constructor() {
         triggerListener {
             onPlayerStart()
         }
-
+        Notifier.getInstance().showPlay(currentMusic)
     }
 
     private fun pausePlayer() {
@@ -132,6 +137,7 @@ class AudioPlayer private constructor() {
         triggerListener {
             onPlayerPause()
         }
+        Notifier.getInstance().showPause(currentMusic)
     }
 
     private fun stopPlayer() {
