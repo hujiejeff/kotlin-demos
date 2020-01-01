@@ -7,27 +7,18 @@
     android:orientation="vertical"
     android:padding="5dp">
 
-    <androidx.cardview.widget.CardView
+    <androidx.viewpager.widget.ViewPager
+        android:clipChildren="false"
+        android:id="@+id/play_view_pager"
         android:layout_width="match_parent"
-        android:layout_height="350dp"
-        android:layout_margin="10dp"
-        app:cardCornerRadius="10dp"
-        app:cardElevation="5dp">
-
-        <ImageView
-            android:scaleType="centerCrop"
-            android:id="@+id/iv_play_cover"
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:src="@drawable/play_page_disc" />
-    </androidx.cardview.widget.CardView>
+        android:padding="10dp"
+        android:layout_height="400dp" />
 
     <SeekBar
         android:id="@+id/seek_bar"
         android:layout_width="match_parent"
         android:thumb="@drawable/seek"
-        android:layout_height="50dp"
-        android:layout_marginTop="20dp"/>
+        android:layout_height="50dp"/>
 
     <LinearLayout
         android:padding="10dp"

@@ -99,14 +99,14 @@ class Notifier {
                 //暂停或播放意图
                 buildRemoteViewsClickEvent(
                     context,
-                    StatusBarReceiver.EXTRA_PLAY_PAUSE,
+                    NotifyBarReceiver.EXTRA_PLAY_PAUSE,
                     0,
                     R.id.iv_status_bar_play
                 )
                 //下一首意图
                 buildRemoteViewsClickEvent(
                     context,
-                    StatusBarReceiver.EXTRA_NEXT,
+                    NotifyBarReceiver.EXTRA_NEXT,
                     1,
                     R.id.iv_status_bar_next
                 )
@@ -125,8 +125,8 @@ class Notifier {
         requestCode: Int,
         resId: Int
     ) {
-        Intent(StatusBarReceiver.ACTION_STATUS_BAR).apply {
-            putExtra(StatusBarReceiver.EXTRA, extraAction)
+        Intent(NotifyBarReceiver.ACTION_STATUS_BAR).apply {
+            putExtra(NotifyBarReceiver.EXTRA, extraAction)
             val pendingIntent = PendingIntent.getBroadcast(
                 context,
                 requestCode,

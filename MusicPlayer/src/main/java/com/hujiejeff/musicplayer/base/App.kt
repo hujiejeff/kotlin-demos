@@ -25,6 +25,11 @@ class App : Application() {
         //TODO 封面加载缓存问题
         //TODO 懒加载
         //TODO 状态栏
-        //TODO 播放页面viewpager
+        //TODO 播放页面viewpager ok
+        //TODO 音频焦点 ok
+        //TODO 耳机事件 ok
+        //TODO 权限问题
+        //TODO 线程池集成
+
     }
 }

@@ -1,11 +1,13 @@
 package com.hujiejeff.musicplayer.service
 
 import android.content.Context
+import android.media.AudioAttributes
+import android.media.AudioFocusRequest
 import android.media.AudioManager
 import android.media.MediaPlayer
+import android.os.Build
 import android.os.Handler
 import android.os.Looper
-import androidx.core.os.postDelayed
 import com.hujiejeff.musicplayer.OnPlayerEventListener
 import com.hujiejeff.musicplayer.component.Notifier
 import com.hujiejeff.musicplayer.entity.Music
@@ -29,7 +31,7 @@ class AudioPlayer private constructor() {
 
     private lateinit var mContext: Context
     private lateinit var mMediaPlayer: MediaPlayer
-    private lateinit var mMusicList: List<Music>
+    val mMusicList: MutableList<Music> = mutableListOf()
     private lateinit var mHandler: Handler
     private var state: Int = STATUS_IDLE
     private val isPreparing: Boolean
@@ -41,7 +43,7 @@ class AudioPlayer private constructor() {
     private val isIdle: Boolean
         get() = state == STATUS_IDLE
     private val position: Int
-        get()  = Preference.play_position
+        get() = Preference.play_position
     val currentMusic: Music
         get() = mMusicList[position]
     private val audioPosition: Int
@@ -49,11 +51,52 @@ class AudioPlayer private constructor() {
     private val playListeners = mutableSetOf<OnPlayerEventListener>()
     private var isResume: Boolean = false
 
+    /**
+     * 音频焦点
+     * */
+    private val audioManager: AudioManager by lazy {
+        mContext.getSystemService(Context.AUDIO_SERVICE) as AudioManager
+    }
 
+    /**
+    * 音频属性
+    * */
+    private val audioAttributes: AudioAttributes? by lazy {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+            AudioAttributes.Builder()
+                .setUsage(AudioAttributes.USAGE_MEDIA)
+                .setContentType(AudioAttributes.CONTENT_TYPE_MUSIC)
+                .build()
+        } else {
+            null
+        }
+    }
+
+    /**
+    * 焦点请求
+    * */
+    private val focusRequest: AudioFocusRequest? by lazy {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+            audioAttributes?.let {
+                AudioFocusRequest.Builder(AudioManager.AUDIOFOCUS_GAIN)
+                    .setAudioAttributes(it)
+                    .setWillPauseWhenDucked(true)
+                    .setOnAudioFocusChangeListener {
+                        handleFocusChange(it)
+                    }.build()
+            }
+        } else {
+            null
+        }
+    }
+
+    /**
+    * 初始化
+    * */
     fun init(context: Context) {
         mContext = context.applicationContext
         mMediaPlayer = MediaPlayer()
-        mMusicList = getMusicList()//TODO 两次获取有问题
+        mMusicList.addAll(getMusicList())//TODO 两次获取有问题
         mHandler = Handler(Looper.getMainLooper())
         mMediaPlayer.apply {
             setOnCompletionListener {
@@ -61,7 +104,7 @@ class AudioPlayer private constructor() {
             }
             setOnPreparedListener {
                 if (isPreparing) {
-                    startPlayer()
+                    startPlayerWithRequestAudioFocus()
                 }
             }
             setOnBufferingUpdateListener { _, percent ->
@@ -72,6 +115,10 @@ class AudioPlayer private constructor() {
         }
     }
 
+    /**
+    * 播放哪一首
+    * @param position 索引
+    * */
     fun play(position: Int) {
         var pos = position
         if (mMusicList.isEmpty()) {
@@ -95,11 +142,14 @@ class AudioPlayer private constructor() {
         Notifier.getInstance().showPlay(music)
     }
 
+    /**
+    * 播放或暂停
+    * */
     fun playOrPause() {
         when {
-            isPreparing -> stopPlayer()
-            isPlaying -> pausePlayer()
-            isPause -> startPlayer()
+            isPreparing -> stopPlayerWithReleaseAudioFocus()
+            isPlaying -> pausePlayerWithReleaseAudioFocus()
+            isPause -> startPlayerWithRequestAudioFocus()
             else -> {
                 play(position)
                 isResume = true
@@ -107,7 +157,39 @@ class AudioPlayer private constructor() {
         }
     }
 
+    fun pause() {
+        pausePlayerWithReleaseAudioFocus()
+    }
+
+    /**
+    * 请求焦点并startPlayer
+    * */
+    private fun startPlayerWithRequestAudioFocus() {
+        if (requestAudioFocus()) {
+            startPlayer()
+        } else {
+            logD("fail to request AudioFocus")
+        }
+    }
+
+    /**
+    * 释放焦点并pausePlayer
+    * */
+    private fun pausePlayerWithReleaseAudioFocus() {
+        releaseAudioFocus()
+        pausePlayer()
+    }
+
+    private fun stopPlayerWithReleaseAudioFocus() {
+        releaseAudioFocus()
+        stopPlayer()
+    }
+
+    /**
+    * 开始MediaPlayer
+    * */
     private fun startPlayer() {
+
         logD("startPlayer")
         if (!isPreparing && !isPause) {
             return
@@ -127,6 +209,9 @@ class AudioPlayer private constructor() {
         Notifier.getInstance().showPlay(currentMusic)
     }
 
+    /**
+    * 暂停MediaPlayer
+    * */
     private fun pausePlayer() {
         if (!isPlaying) {
             return
@@ -140,6 +225,9 @@ class AudioPlayer private constructor() {
         Notifier.getInstance().showPause(currentMusic)
     }
 
+    /**
+    * 暂停MediaPlayer
+    * */
     private fun stopPlayer() {
         if (isIdle) {
             return
@@ -149,26 +237,35 @@ class AudioPlayer private constructor() {
         state = STATUS_IDLE
     }
 
+    /**
+    * 下一首
+    * */
     fun next() {
         playNextOrPre(false)
     }
 
+    /**
+    * 上一首
+    * */
     fun pre() {
         playNextOrPre(true)
     }
 
+    /**
+    * 上一首或下一首
+    * */
     private fun playNextOrPre(next: Boolean) {
         if (mMusicList.isEmpty()) {
             return
         }
-        when(PlayMode.valueOf(Preference.play_mode)) {
+        when (PlayMode.valueOf(Preference.play_mode)) {
             PlayMode.SHUFFLE -> play(Random(1).nextInt(mMusicList.size))
-            PlayMode.SINGLE -> stopPlayer()
+            PlayMode.SINGLE -> stopPlayerWithReleaseAudioFocus()
             PlayMode.SINGLE_LOOP -> play(position)
             PlayMode.LOOP -> {
                 if (next) {
                     play(position - 1)
-                } else{
+                } else {
                     play(position + 1)
                 }
             }
@@ -176,6 +273,9 @@ class AudioPlayer private constructor() {
 
     }
 
+    /**
+    * 定位
+    * */
     fun seekTo(msec: Int) {
         if (isPlaying || isPause || isIdle) {
             if (isIdle) {
@@ -188,6 +288,9 @@ class AudioPlayer private constructor() {
         }
     }
 
+    /**
+    * 设置播放模式
+    * */
     fun setMode(playMode: PlayMode) {
         Preference.play_mode = playMode.value
         triggerListener {
@@ -195,18 +298,96 @@ class AudioPlayer private constructor() {
         }
     }
 
+    /**
+    * 设置监听
+    * */
     fun addOnPlayerEventListener(listener: OnPlayerEventListener) {
         playListeners.add(listener)
     }
 
+    /**
+    * 移除监听
+    * */
     fun removePlayerEventListener(listener: OnPlayerEventListener) {
         playListeners.remove(listener)
     }
 
+    /**
+    * 遍历触发
+    * */
     private fun triggerListener(action: OnPlayerEventListener.() -> Unit) {
         playListeners.forEach(action)
     }
 
+    /**
+     * 请求音频焦点
+     * */
+    private fun requestAudioFocus(): Boolean {
+        val result: Int = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+            focusRequest?.let { audioManager.requestAudioFocus(it) }!!
+        } else {
+            audioManager.requestAudioFocus({
+                handleFocusChange(it)
+            }, AudioManager.STREAM_MUSIC, AudioManager.AUDIOFOCUS_GAIN)
+        }
+        return result == AudioManager.AUDIOFOCUS_REQUEST_GRANTED
+    }
+
+    /**
+     * 释放音频焦点
+     * */
+    private fun releaseAudioFocus() {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+            audioManager.abandonAudioFocusRequest(focusRequest!!)
+        } else {
+            audioManager.abandonAudioFocus {
+                logD("test")
+            }
+        }
+    }
+
+    /**
+    * 处理焦点变化
+    * */
+    private fun handleFocusChange(focusChange: Int) {
+        when (focusChange) {
+            AudioManager.AUDIOFOCUS_GAIN -> {
+                startPlayer()
+            }
+            AudioManager.AUDIOFOCUS_LOSS_TRANSIENT -> {
+                pausePlayer()
+            }
+            AudioManager.AUDIOFOCUS_LOSS -> {
+                stopPlayer()
+            }
+        }
+    }
+
+    private fun <T> checkAndroidVersionAction(
+        version: Int,
+        action: () -> T,
+        compatAction: (() -> T)? = null
+    ): T? {
+        return if (Build.VERSION.SDK_INT >= version) {
+            action()
+        } else {
+            compatAction?.invoke()
+        }
+    }
+
+
+    /**
+    * 释放
+    * */
+    fun release() {
+        stopPlayer()
+        mMediaPlayer.release()
+    }
+
+
+    /**
+    * 更新进度
+    * */
     private val publishRunnable = object : Runnable {
         override fun run() {
             if (isPlaying) {
