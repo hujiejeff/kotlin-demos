@@ -5,6 +5,7 @@ import android.content.Context
 import android.content.Intent
 import android.content.ServiceConnection
 import android.graphics.Color
+import android.os.Build
 import android.os.Bundle
 import android.os.IBinder
 import android.os.SystemClock
@@ -19,7 +20,9 @@ import com.hujiejeff.musicplayer.fragment.MusicListFragment
 import com.hujiejeff.musicplayer.fragment.MusicPlayFragment
 import com.hujiejeff.musicplayer.service.AudioPlayer
 import com.hujiejeff.musicplayer.service.PlayService
+import com.hujiejeff.musicplayer.util.checkAndroidVersionAction
 import com.hujiejeff.musicplayer.util.logD
+import com.hujiejeff.musicplayer.util.setTransparentStatusBar
 import com.hujiejeff.musicplayer.util.transaction
 import kotlinx.android.synthetic.main.activity_main.*
 import kotlinx.android.synthetic.main.include_activity_main.*
@@ -28,7 +31,13 @@ import kotlinx.android.synthetic.main.include_play_bar.*
 class MainActivity : BaseActivity() {
     private val fragmentList =
         listOf(MusicListFragment(), AlbumListFragment(), ArtistListFragment())
-    private val titleList by lazy { listOf(getString(R.string.tab_music), getString(R.string.tab_album), getString(R.string.tab_artist)) }
+    private val titleList by lazy {
+        listOf(
+            getString(R.string.tab_music),
+            getString(R.string.tab_album),
+            getString(R.string.tab_artist)
+        )
+    }
     private val musicPlayFragment by lazy { MusicPlayFragment() }
     private var isShowMusicPlay = false
     private var backPress = 0
@@ -56,7 +65,7 @@ class MainActivity : BaseActivity() {
         }
 
         val bindIntent = Intent(this, PlayService::class.java)
-        val serviceConnection = object : ServiceConnection{
+        val serviceConnection = object : ServiceConnection {
             override fun onServiceDisconnected(p0: ComponentName?) {
             }
 
@@ -65,6 +74,10 @@ class MainActivity : BaseActivity() {
             }
         }
         bindService(bindIntent, serviceConnection, Context.BIND_AUTO_CREATE)
+
+        checkAndroidVersionAction(Build.VERSION_CODES.M, {
+            window.setTransparentStatusBar(false)
+        })
     }
 
     override fun onBackPressed() {
@@ -111,8 +124,8 @@ class MainActivity : BaseActivity() {
     }
 
 
-
-    inner class PagerAdapter : FragmentPagerAdapter(supportFragmentManager, BEHAVIOR_RESUME_ONLY_CURRENT_FRAGMENT) {
+    inner class PagerAdapter :
+        FragmentPagerAdapter(supportFragmentManager, BEHAVIOR_RESUME_ONLY_CURRENT_FRAGMENT) {
         override fun getCount() = fragmentList.size
         override fun getItem(position: Int) = fragmentList[position]
         override fun getPageTitle(position: Int): CharSequence? = titleList[position]

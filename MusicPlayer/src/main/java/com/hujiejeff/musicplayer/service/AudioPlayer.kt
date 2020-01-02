@@ -42,10 +42,18 @@ class AudioPlayer private constructor() {
         get() = state == STATUS_PLAYING
     private val isIdle: Boolean
         get() = state == STATUS_IDLE
-    private val position: Int
+    private var position
+        set(value) {
+            Preference.play_position = value
+        }
         get() = Preference.play_position
     val currentMusic: Music
-        get() = mMusicList[position]
+        get() {
+            if (position !in 0 until mMusicList.size) {
+                position = 0
+            }
+            return mMusicList[position]
+        }
     private val audioPosition: Int
         get() = if (isPause || isPlaying) mMediaPlayer.currentPosition else 0
     private val playListeners = mutableSetOf<OnPlayerEventListener>()
@@ -59,8 +67,8 @@ class AudioPlayer private constructor() {
     }
 
     /**
-    * 音频属性
-    * */
+     * 音频属性
+     * */
     private val audioAttributes: AudioAttributes? by lazy {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
             AudioAttributes.Builder()
@@ -73,8 +81,8 @@ class AudioPlayer private constructor() {
     }
 
     /**
-    * 焦点请求
-    * */
+     * 焦点请求
+     * */
     private val focusRequest: AudioFocusRequest? by lazy {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
             audioAttributes?.let {
@@ -91,8 +99,8 @@ class AudioPlayer private constructor() {
     }
 
     /**
-    * 初始化
-    * */
+     * 初始化
+     * */
     fun init(context: Context) {
         mContext = context.applicationContext
         mMediaPlayer = MediaPlayer()
@@ -116,11 +124,11 @@ class AudioPlayer private constructor() {
     }
 
     /**
-    * 播放哪一首
-    * @param position 索引
-    * */
+     * 播放哪一首
+     * @param position 索引
+     * */
     fun play(position: Int) {
-        var pos = position
+        var pos = position + mMusicList.size
         if (mMusicList.isEmpty()) {
             return
         }
@@ -143,8 +151,8 @@ class AudioPlayer private constructor() {
     }
 
     /**
-    * 播放或暂停
-    * */
+     * 播放或暂停
+     * */
     fun playOrPause() {
         when {
             isPreparing -> stopPlayerWithReleaseAudioFocus()
@@ -162,8 +170,8 @@ class AudioPlayer private constructor() {
     }
 
     /**
-    * 请求焦点并startPlayer
-    * */
+     * 请求焦点并startPlayer
+     * */
     private fun startPlayerWithRequestAudioFocus() {
         if (requestAudioFocus()) {
             startPlayer()
@@ -173,8 +181,8 @@ class AudioPlayer private constructor() {
     }
 
     /**
-    * 释放焦点并pausePlayer
-    * */
+     * 释放焦点并pausePlayer
+     * */
     private fun pausePlayerWithReleaseAudioFocus() {
         releaseAudioFocus()
         pausePlayer()
@@ -186,8 +194,8 @@ class AudioPlayer private constructor() {
     }
 
     /**
-    * 开始MediaPlayer
-    * */
+     * 开始MediaPlayer
+     * */
     private fun startPlayer() {
 
         logD("startPlayer")
@@ -210,8 +218,8 @@ class AudioPlayer private constructor() {
     }
 
     /**
-    * 暂停MediaPlayer
-    * */
+     * 暂停MediaPlayer
+     * */
     private fun pausePlayer() {
         if (!isPlaying) {
             return
@@ -226,8 +234,8 @@ class AudioPlayer private constructor() {
     }
 
     /**
-    * 暂停MediaPlayer
-    * */
+     * 暂停MediaPlayer
+     * */
     private fun stopPlayer() {
         if (isIdle) {
             return
@@ -238,22 +246,22 @@ class AudioPlayer private constructor() {
     }
 
     /**
-    * 下一首
-    * */
+     * 下一首
+     * */
     fun next() {
         playNextOrPre(false)
     }
 
     /**
-    * 上一首
-    * */
+     * 上一首
+     * */
     fun pre() {
         playNextOrPre(true)
     }
 
     /**
-    * 上一首或下一首
-    * */
+     * 上一首或下一首
+     * */
     private fun playNextOrPre(next: Boolean) {
         if (mMusicList.isEmpty()) {
             return
@@ -274,8 +282,8 @@ class AudioPlayer private constructor() {
     }
 
     /**
-    * 定位
-    * */
+     * 定位
+     * */
     fun seekTo(msec: Int) {
         if (isPlaying || isPause || isIdle) {
             if (isIdle) {
@@ -289,8 +297,8 @@ class AudioPlayer private constructor() {
     }
 
     /**
-    * 设置播放模式
-    * */
+     * 设置播放模式
+     * */
     fun setMode(playMode: PlayMode) {
         Preference.play_mode = playMode.value
         triggerListener {
@@ -299,22 +307,22 @@ class AudioPlayer private constructor() {
     }
 
     /**
-    * 设置监听
-    * */
+     * 设置监听
+     * */
     fun addOnPlayerEventListener(listener: OnPlayerEventListener) {
         playListeners.add(listener)
     }
 
     /**
-    * 移除监听
-    * */
+     * 移除监听
+     * */
     fun removePlayerEventListener(listener: OnPlayerEventListener) {
         playListeners.remove(listener)
     }
 
     /**
-    * 遍历触发
-    * */
+     * 遍历触发
+     * */
     private fun triggerListener(action: OnPlayerEventListener.() -> Unit) {
         playListeners.forEach(action)
     }
@@ -347,8 +355,8 @@ class AudioPlayer private constructor() {
     }
 
     /**
-    * 处理焦点变化
-    * */
+     * 处理焦点变化
+     * */
     private fun handleFocusChange(focusChange: Int) {
         when (focusChange) {
             AudioManager.AUDIOFOCUS_GAIN -> {
@@ -363,22 +371,10 @@ class AudioPlayer private constructor() {
         }
     }
 
-    private fun <T> checkAndroidVersionAction(
-        version: Int,
-        action: () -> T,
-        compatAction: (() -> T)? = null
-    ): T? {
-        return if (Build.VERSION.SDK_INT >= version) {
-            action()
-        } else {
-            compatAction?.invoke()
-        }
-    }
-
 
     /**
-    * 释放
-    * */
+     * 释放
+     * */
     fun release() {
         stopPlayer()
         mMediaPlayer.release()
@@ -386,8 +382,8 @@ class AudioPlayer private constructor() {
 
 
     /**
-    * 更新进度
-    * */
+     * 更新进度
+     * */
     private val publishRunnable = object : Runnable {
         override fun run() {
             if (isPlaying) {

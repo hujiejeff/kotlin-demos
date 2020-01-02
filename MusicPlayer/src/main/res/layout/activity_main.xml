@@ -8,6 +8,7 @@
     tools:context=".MainActivity">
     <include layout="@layout/include_activity_main"/>
     <com.google.android.material.navigation.NavigationView
+        android:fitsSystemWindows="false"
         android:background="@color/colorPrimaryDark"
         android:layout_gravity="start"
         app:menu="@menu/nav_menu"

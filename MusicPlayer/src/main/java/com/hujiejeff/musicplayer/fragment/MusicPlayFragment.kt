@@ -1,5 +1,6 @@
 package com.hujiejeff.musicplayer.fragment
 
+import android.os.Build
 import android.os.Bundle
 import android.os.Handler
 import android.os.Looper
@@ -17,9 +18,7 @@ import com.hujiejeff.musicplayer.entity.Music
 import com.hujiejeff.musicplayer.entity.PlayMode
 import com.hujiejeff.musicplayer.service.AudioPlayer
 import com.hujiejeff.musicplayer.storage.Preference
-import com.hujiejeff.musicplayer.util.getCover
-import com.hujiejeff.musicplayer.util.getMusicTimeFormatString
-import com.hujiejeff.musicplayer.util.logD
+import com.hujiejeff.musicplayer.util.*
 import kotlinx.android.synthetic.main.card_album.view.*
 import kotlinx.android.synthetic.main.fragment_music_play.*
 import kotlinx.android.synthetic.main.fragment_music_play.view.*
@@ -36,7 +35,7 @@ class MusicPlayFragment : BaseFragment(), OnPlayerEventListener, SeekBar.OnSeekB
 
     override fun getLayoutId() = R.layout.fragment_music_play
 
-    override fun iniView(view: View) {
+    override fun initView(view: View) {
         view.apply {
             updateUI(music)
             iv_play_mode_loop.setOnClickListener {
@@ -92,6 +91,13 @@ class MusicPlayFragment : BaseFragment(), OnPlayerEventListener, SeekBar.OnSeekB
             })
             play_view_pager.currentItem = AudioPlayer.INSTANCE.mMusicList.indexOf(music)
         }
+    }
+
+    override fun onHiddenChanged(hidden: Boolean) {
+        super.onHiddenChanged(hidden)
+        checkAndroidVersionAction(Build.VERSION_CODES.M, {
+            activity?.window?.setTransparentStatusBar(!hidden)
+        })
     }
 
     private fun changeShuffleMode() {

@@ -24,7 +24,7 @@ class MusicListFragment : BaseFragment() {
     private val musicList: MutableList<Music> = mutableListOf()
 
     override fun getLayoutId(): Int = R.layout.fragment_list
-    override fun iniView(view: View) {
+    override fun initView(view: View) {
         logD(view.rv_list.toString())
         view.rv_list.apply {
             adapter = MusicRecyclerViewAdapter().apply {

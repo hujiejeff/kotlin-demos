@@ -26,7 +26,7 @@ class AlbumListFragment: BaseFragment() {
 
     override fun getLayoutId(): Int = R.layout.fragment_list
 
-    override fun iniView(view: View) {
+    override fun initView(view: View) {
         view.rv_list.apply {
             adapter = AlbumRecycleViewAdapter().apply {
                 setOnItemClickListener {

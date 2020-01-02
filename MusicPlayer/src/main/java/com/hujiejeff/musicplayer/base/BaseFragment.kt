@@ -13,12 +13,12 @@ abstract class BaseFragment : Fragment() {
         savedInstanceState: Bundle?
     ): View? {
         val view = inflater.inflate(getLayoutId(), container, false)
-        iniView(view)
+        initView(view)
         return view
     }
 
     abstract fun getLayoutId(): Int
-    abstract fun iniView(view: View)
+    abstract fun initView(view: View)
 
     override fun onRequestPermissionsResult(
         requestCode: Int,
