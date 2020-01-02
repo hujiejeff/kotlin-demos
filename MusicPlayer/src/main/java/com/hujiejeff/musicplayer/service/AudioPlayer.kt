@@ -52,7 +52,7 @@ class AudioPlayer private constructor() {
     private var isResume: Boolean = false
 
     /**
-     * 音频焦点
+     * 音频管理服务
      * */
     private val audioManager: AudioManager by lazy {
         mContext.getSystemService(Context.AUDIO_SERVICE) as AudioManager

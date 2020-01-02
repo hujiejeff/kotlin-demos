@@ -23,13 +23,13 @@ class App : Application() {
 
     fun todo() {
         //TODO 封面加载缓存问题
-        //TODO 懒加载
+        //TODO 懒加载 ok
         //TODO 状态栏
         //TODO 播放页面viewpager ok
         //TODO 音频焦点 ok
         //TODO 耳机事件 ok
         //TODO 权限问题
-        //TODO 线程池集成
-
+        //TODO 线程池集成 ok
+        //TODO 当没有音乐的时候
     }
 }

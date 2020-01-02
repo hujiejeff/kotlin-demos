@@ -112,7 +112,7 @@ class MainActivity : BaseActivity() {
 
 
 
-    inner class PagerAdapter : FragmentPagerAdapter(supportFragmentManager) {
+    inner class PagerAdapter : FragmentPagerAdapter(supportFragmentManager, BEHAVIOR_RESUME_ONLY_CURRENT_FRAGMENT) {
         override fun getCount() = fragmentList.size
         override fun getItem(position: Int) = fragmentList[position]
         override fun getPageTitle(position: Int): CharSequence? = titleList[position]

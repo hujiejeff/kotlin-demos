@@ -8,17 +8,24 @@ import android.os.Binder
 import com.hujiejeff.musicplayer.component.HeadSetReceiver
 import com.hujiejeff.musicplayer.component.Notifier
 import com.hujiejeff.musicplayer.component.NotifyBarReceiver
+import com.hujiejeff.musicplayer.entity.Music
+import com.hujiejeff.musicplayer.execute.AppExecutors
+import com.hujiejeff.musicplayer.util.getAlbumList
+import com.hujiejeff.musicplayer.util.getMusicList
 
 /**
  * Create by hujie on 2019/12/31
  */
-class PlayService: Service() {
+class PlayService : Service() {
 
-    inner class PlayBinder: Binder() {
+    inner class PlayBinder : Binder() {
         val service get() = this@PlayService
     }
-    private  val statusReceiver by lazy { NotifyBarReceiver() }
-    private  val headSetReceiver by lazy { HeadSetReceiver() }
+
+    private val statusReceiver by lazy { NotifyBarReceiver() }
+    private val headSetReceiver by lazy { HeadSetReceiver() }
+    private val appExecutors by lazy { AppExecutors() }
+    private val localMusicList: MutableList<Music> = mutableListOf()
 
     override fun onBind(p0: Intent?) = PlayBinder()
 
@@ -35,6 +42,7 @@ class PlayService: Service() {
             addAction(BluetoothHeadset.ACTION_CONNECTION_STATE_CHANGED)
             registerReceiver(headSetReceiver, this)
         }
+
     }
 
     override fun onDestroy() {
@@ -42,6 +50,25 @@ class PlayService: Service() {
         AudioPlayer.INSTANCE.release()
         unregisterReceiver(statusReceiver)
         unregisterReceiver(headSetReceiver)
+    }
+
+    fun loadMusicList(isLocal: Boolean) {
+        if (isLocal) {
+            loadLocalMusicList()
+        } else {
+            loadRemoteMusicList()
+        }
+    }
+
+    private fun loadLocalMusicList() {
+        appExecutors.diskIO.execute {
+            localMusicList.addAll(getMusicList())
+//            AudioPlayer.INSTANCE.mMusicList = localMusicList
+        }
+    }
+
+    private fun loadRemoteMusicList() {
+
     }
 
 

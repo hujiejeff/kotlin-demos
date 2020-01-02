@@ -31,7 +31,7 @@ private const val DURATION = MediaStore.Audio.AudioColumns.DURATION
 private const val SIZE = MediaStore.Audio.AudioColumns.SIZE
 private const val SORT_ORDER = MediaStore.Audio.Media.DEFAULT_SORT_ORDER
 
-fun getMusicList(): List<Music> {
+fun getMusicList(): MutableList<Music> {
     val musicList = mutableListOf<Music>()
     val cursor = queryAll(
         musicUri, arrayOf(
