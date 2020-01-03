@@ -1,12 +1,16 @@
 package com.hujiejeff.musicplayer.util
 
 import android.content.ContentUris
+import android.content.Context
 import android.database.Cursor
 import android.graphics.Bitmap
 import android.graphics.BitmapFactory
 import android.net.Uri
 import android.provider.BaseColumns
 import android.provider.MediaStore
+import android.view.View
+import android.widget.ImageView
+import com.bumptech.glide.Glide
 import com.hujiejeff.musicplayer.R
 import com.hujiejeff.musicplayer.base.App
 import com.hujiejeff.musicplayer.data.entity.Album
@@ -94,10 +98,20 @@ fun getArtistList(): MutableList<Artist> {
     return artistList
 }
 
+fun ImageView.loadCover(albumID: Long) {
+    val artUri = Uri.parse("content://media/external/audio/albumart")
+    val uri = ContentUris.withAppendedId(artUri, albumID)
+    Glide.with(context)
+        .load(uri)
+        .placeholder(R.drawable.default_cover)
+        .error(R.drawable.default_cover)
+        .into(this)
+}
+
 fun getCover(albumID: Long): Bitmap {
     val artUri = Uri.parse("content://media/external/audio/albumart")
     val uri = ContentUris.withAppendedId(artUri, albumID)
-    try {
+        try {
         val bitmap =
             BitmapFactory.decodeStream(App.appContext.contentResolver.openInputStream(uri))//也许没封面
         if (bitmap != null) {
@@ -109,7 +123,8 @@ fun getCover(albumID: Long): Bitmap {
     return BitmapFactory.decodeResource(App.appContext.resources, R.drawable.default_cover)
 }
 
-fun getArtistCover() = BitmapFactory.decodeResource(App.appContext.resources,R.drawable.default_artist_art)
+fun getArtistCover(): Bitmap =
+    BitmapFactory.decodeResource(App.appContext.resources, R.drawable.default_artist_art)
 
 
 fun queryAll(uri: Uri, projection: Array<String>): Cursor? = App.appContext.contentResolver.query(

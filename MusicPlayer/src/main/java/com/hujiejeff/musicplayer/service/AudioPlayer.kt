@@ -31,7 +31,7 @@ class AudioPlayer private constructor() {
 
     private lateinit var mContext: Context
     private lateinit var mMediaPlayer: MediaPlayer
-    val mMusicList: MutableList<Music> = mutableListOf()
+    var mMusicList: MutableList<Music> = mutableListOf()
     private lateinit var mHandler: Handler
     private var state: Int = STATUS_IDLE
     private val isPreparing: Boolean
@@ -47,8 +47,9 @@ class AudioPlayer private constructor() {
             Preference.play_position = value
         }
         get() = Preference.play_position
-    val currentMusic: Music
+    val currentMusic: Music?
         get() {
+            if (mMusicList.size == 0) return null
             if (position !in 0 until mMusicList.size) {
                 position = 0
             }
@@ -104,7 +105,6 @@ class AudioPlayer private constructor() {
     fun init(context: Context) {
         mContext = context.applicationContext
         mMediaPlayer = MediaPlayer()
-        mMusicList.addAll(getMusicList())//TODO 两次获取有问题
         mHandler = Handler(Looper.getMainLooper())
         mMediaPlayer.apply {
             setOnCompletionListener {
@@ -214,7 +214,7 @@ class AudioPlayer private constructor() {
         triggerListener {
             onPlayerStart()
         }
-        Notifier.getInstance().showPlay(currentMusic)
+        Notifier.getInstance().showPlay(currentMusic!!)
     }
 
     /**
@@ -230,7 +230,7 @@ class AudioPlayer private constructor() {
         triggerListener {
             onPlayerPause()
         }
-        Notifier.getInstance().showPause(currentMusic)
+        Notifier.getInstance().showPause(currentMusic!!)
     }
 
     /**

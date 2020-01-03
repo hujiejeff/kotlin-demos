@@ -7,14 +7,16 @@ import android.widget.Toast
 import androidx.recyclerview.widget.DefaultItemAnimator
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
+import com.hujiejeff.musicplayer.MainActivity
 import com.hujiejeff.musicplayer.R
+import com.hujiejeff.musicplayer.base.App
 import com.hujiejeff.musicplayer.base.BaseRecyclerViewAdapter
 import com.hujiejeff.musicplayer.base.BaseFragment
 import com.hujiejeff.musicplayer.base.BaseViewHolder
 import com.hujiejeff.musicplayer.data.entity.Music
+import com.hujiejeff.musicplayer.data.source.LocalDataSource
 import com.hujiejeff.musicplayer.service.AudioPlayer
-import com.hujiejeff.musicplayer.util.getCover
-import com.hujiejeff.musicplayer.util.getMusicList
+import com.hujiejeff.musicplayer.util.loadCover
 import com.hujiejeff.musicplayer.util.logD
 import kotlinx.android.synthetic.main.fragment_list.view.*
 import kotlinx.android.synthetic.main.item_music_list.view.*
@@ -22,6 +24,7 @@ import kotlinx.android.synthetic.main.item_music_list.view.*
 class MusicListFragment : BaseFragment() {
 
     private val musicList: MutableList<Music> = mutableListOf()
+    private lateinit var mainActivity: MainActivity
 
     override fun getLayoutId(): Int = R.layout.fragment_list
     override fun initView(view: View) {
@@ -39,6 +42,7 @@ class MusicListFragment : BaseFragment() {
 
     override fun onActivityCreated(savedInstanceState: Bundle?) {
         super.onActivityCreated(savedInstanceState)
+        mainActivity = activity as MainActivity
         if (musicList.isEmpty()) {
             loadMusicList()
         }
@@ -53,8 +57,18 @@ class MusicListFragment : BaseFragment() {
             )
             .result(object : PermissionReq.Result {
                 override fun onGranted() {
-                    musicList.addAll(getMusicList())
-                    view?.rv_list?.adapter?.notifyDataSetChanged()
+                    App.dateRepository.getLocalMusicList(object: LocalDataSource.Callback<Music>{
+                        override fun onLoaded(dataList: MutableList<Music>) {
+                            musicList.addAll(dataList)
+                            AudioPlayer.INSTANCE.mMusicList = musicList
+                            view?.rv_list?.adapter?.notifyDataSetChanged()
+                            mainActivity.loadControlPanel()
+                        }
+
+                        override fun onFailed(mes: String) {
+                            Toast.makeText(context, mes, Toast.LENGTH_SHORT).show()
+                        }
+                    })
                 }
                 override fun onDenied() {
                     Toast.makeText(context, "permission deny", Toast.LENGTH_SHORT).show()
@@ -68,7 +82,7 @@ class MusicListFragment : BaseFragment() {
             holder.itemView.apply {
                 tv_music_title.text = data.title
                 tv_music_artist.text = data.artist
-                iv_music_cover.setImageBitmap(getCover(data.albumID))
+                iv_music_cover.loadCover(data.albumID)
             }
         }
     }

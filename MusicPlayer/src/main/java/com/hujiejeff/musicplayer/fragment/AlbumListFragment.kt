@@ -12,7 +12,7 @@ import com.hujiejeff.musicplayer.base.BaseRecyclerViewAdapter
 import com.hujiejeff.musicplayer.base.BaseViewHolder
 import com.hujiejeff.musicplayer.data.entity.Album
 import com.hujiejeff.musicplayer.util.getAlbumList
-import com.hujiejeff.musicplayer.util.getCover
+import com.hujiejeff.musicplayer.util.loadCover
 import kotlinx.android.synthetic.main.fragment_list.view.*
 import kotlinx.android.synthetic.main.item_album_list.view.*
 
@@ -63,7 +63,7 @@ class AlbumListFragment: BaseFragment() {
             holder.itemView.apply {
                 album_title.text = data.title
                 album_artist.text = data.artist
-                album_cover.setImageBitmap(getCover(data.id))
+                album_cover.loadCover(data.id)
             }
         }
     }

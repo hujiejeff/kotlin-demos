@@ -14,6 +14,7 @@ import android.widget.Toast
 import androidx.core.view.GravityCompat
 import androidx.fragment.app.FragmentPagerAdapter
 import com.hujiejeff.musicplayer.base.BaseActivity
+import com.hujiejeff.musicplayer.data.entity.Music
 import com.hujiejeff.musicplayer.fragment.AlbumListFragment
 import com.hujiejeff.musicplayer.fragment.ArtistListFragment
 import com.hujiejeff.musicplayer.fragment.MusicListFragment
@@ -39,10 +40,13 @@ class MainActivity : BaseActivity() {
         )
     }
     private val musicPlayFragment by lazy { MusicPlayFragment() }
+    private var isAddMusicPlay = false
     private var isShowMusicPlay = false
     private var backPress = 0
     private var firstBackPressTime = 0L
     private var secondBackPressTime = 1L
+
+    private lateinit var controlPanel: ControlPanel
 
 
     override fun layoutResId() = R.layout.activity_main
@@ -58,19 +62,14 @@ class MainActivity : BaseActivity() {
         play_bar.setOnClickListener {
             openMusicPlayFragment()
         }
-
-        transaction {
-            add(android.R.id.content, musicPlayFragment)
-            hide(musicPlayFragment)
-        }
-
+        controlPanel = ControlPanel(play_bar)
         val bindIntent = Intent(this, PlayService::class.java)
         val serviceConnection = object : ServiceConnection {
             override fun onServiceDisconnected(p0: ComponentName?) {
             }
 
             override fun onServiceConnected(p0: ComponentName?, p1: IBinder?) {
-                AudioPlayer.INSTANCE.addOnPlayerEventListener(ControlPanel(play_bar))
+                AudioPlayer.INSTANCE.addOnPlayerEventListener(controlPanel)
             }
         }
         bindService(bindIntent, serviceConnection, Context.BIND_AUTO_CREATE)
@@ -109,6 +108,10 @@ class MainActivity : BaseActivity() {
 
     private fun openMusicPlayFragment() {
         transaction {
+            if (!isAddMusicPlay) {
+                add(android.R.id.content, musicPlayFragment)
+                isAddMusicPlay = true
+            }
             setCustomAnimations(R.anim.fragment_slide_up, 0)
             show(musicPlayFragment)
             isShowMusicPlay = true
@@ -121,6 +124,10 @@ class MainActivity : BaseActivity() {
             hide(musicPlayFragment)
             isShowMusicPlay = false
         }
+    }
+
+    fun loadControlPanel() {
+        controlPanel.loadMusic()
     }
 
 

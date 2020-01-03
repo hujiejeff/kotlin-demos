@@ -23,7 +23,7 @@ import kotlinx.android.synthetic.main.fragment_music_play.view.*
 
 class MusicPlayFragment : BaseFragment(), OnPlayerEventListener, SeekBar.OnSeekBarChangeListener {
 
-    private val music
+    private val music: Music?
         get() = AudioPlayer.INSTANCE.currentMusic
     private val player
         get() = AudioPlayer.INSTANCE
@@ -35,7 +35,9 @@ class MusicPlayFragment : BaseFragment(), OnPlayerEventListener, SeekBar.OnSeekB
 
     override fun initView(view: View) {
         view.apply {
-            updateUI(music)
+            music?.let {
+                updateUI(it)
+            }
             iv_play_mode_loop.setOnClickListener {
                 changeLoopMode()
             }
@@ -89,12 +91,17 @@ class MusicPlayFragment : BaseFragment(), OnPlayerEventListener, SeekBar.OnSeekB
             })
             play_view_pager.currentItem = AudioPlayer.INSTANCE.mMusicList.indexOf(music)
         }
+        transparentStatusBar(true)
     }
 
     override fun onHiddenChanged(hidden: Boolean) {
         super.onHiddenChanged(hidden)
+        transparentStatusBar(!hidden)
+    }
+
+    private fun transparentStatusBar(show: Boolean) {
         checkAndroidVersionAction(Build.VERSION_CODES.M, {
-            activity?.window?.setTransparentStatusBar(!hidden)
+            activity?.window?.setTransparentStatusBar(show)
         })
     }
 
@@ -145,7 +152,7 @@ class MusicPlayFragment : BaseFragment(), OnPlayerEventListener, SeekBar.OnSeekB
             savedInstanceState: Bundle?
         ): View? {
             val view = inflater.inflate(R.layout.card_album, container, false)
-            view.album_cover.setImageBitmap(getCover(albumID))
+            view.album_cover.loadCover(albumID)
             return view
         }
     }
