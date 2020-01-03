@@ -1,9 +1,9 @@
 package com.hujiejeff.musicplayer
 
 import android.view.View
-import com.hujiejeff.musicplayer.entity.Music
+import com.hujiejeff.musicplayer.data.entity.Music
 import com.hujiejeff.musicplayer.service.AudioPlayer
-import com.hujiejeff.musicplayer.storage.Preference
+import com.hujiejeff.musicplayer.data.Preference
 import com.hujiejeff.musicplayer.util.getCover
 import kotlinx.android.synthetic.main.include_play_bar.view.*
 

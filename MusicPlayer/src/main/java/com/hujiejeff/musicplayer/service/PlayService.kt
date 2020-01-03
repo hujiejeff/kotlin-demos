@@ -8,9 +8,8 @@ import android.os.Binder
 import com.hujiejeff.musicplayer.component.HeadSetReceiver
 import com.hujiejeff.musicplayer.component.Notifier
 import com.hujiejeff.musicplayer.component.NotifyBarReceiver
-import com.hujiejeff.musicplayer.entity.Music
+import com.hujiejeff.musicplayer.data.entity.Music
 import com.hujiejeff.musicplayer.execute.AppExecutors
-import com.hujiejeff.musicplayer.util.getAlbumList
 import com.hujiejeff.musicplayer.util.getMusicList
 
 /**

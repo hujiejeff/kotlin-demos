@@ -9,7 +9,7 @@ import com.hujiejeff.musicplayer.R
 import com.hujiejeff.musicplayer.base.BaseFragment
 import com.hujiejeff.musicplayer.base.BaseRecyclerViewAdapter
 import com.hujiejeff.musicplayer.base.BaseViewHolder
-import com.hujiejeff.musicplayer.entity.Artist
+import com.hujiejeff.musicplayer.data.entity.Artist
 import com.hujiejeff.musicplayer.util.getArtistCover
 import com.hujiejeff.musicplayer.util.getArtistList
 import kotlinx.android.synthetic.main.fragment_list.view.*

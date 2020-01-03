@@ -10,9 +10,9 @@ import android.os.Handler
 import android.os.Looper
 import com.hujiejeff.musicplayer.OnPlayerEventListener
 import com.hujiejeff.musicplayer.component.Notifier
-import com.hujiejeff.musicplayer.entity.Music
-import com.hujiejeff.musicplayer.entity.PlayMode
-import com.hujiejeff.musicplayer.storage.Preference
+import com.hujiejeff.musicplayer.data.entity.Music
+import com.hujiejeff.musicplayer.data.entity.PlayMode
+import com.hujiejeff.musicplayer.data.Preference
 import com.hujiejeff.musicplayer.util.getMusicList
 import com.hujiejeff.musicplayer.util.logD
 import kotlin.random.Random

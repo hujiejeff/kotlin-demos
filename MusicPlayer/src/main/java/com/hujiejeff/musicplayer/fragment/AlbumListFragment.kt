@@ -2,21 +2,17 @@ package com.hujiejeff.musicplayer.fragment
 
 import PermissionReq
 import android.Manifest
-import android.graphics.Color
 import android.os.Bundle
 import android.view.View
-import android.widget.BaseAdapter
 import android.widget.Toast
 import androidx.recyclerview.widget.GridLayoutManager
 import com.hujiejeff.musicplayer.R
 import com.hujiejeff.musicplayer.base.BaseFragment
 import com.hujiejeff.musicplayer.base.BaseRecyclerViewAdapter
 import com.hujiejeff.musicplayer.base.BaseViewHolder
-import com.hujiejeff.musicplayer.entity.Album
+import com.hujiejeff.musicplayer.data.entity.Album
 import com.hujiejeff.musicplayer.util.getAlbumList
 import com.hujiejeff.musicplayer.util.getCover
-import com.hujiejeff.musicplayer.util.getMusicList
-import com.hujiejeff.musicplayer.util.logD
 import kotlinx.android.synthetic.main.fragment_list.view.*
 import kotlinx.android.synthetic.main.item_album_list.view.*
 

@@ -2,8 +2,6 @@ package com.hujiejeff.musicplayer.fragment
 
 import android.os.Build
 import android.os.Bundle
-import android.os.Handler
-import android.os.Looper
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -14,10 +12,10 @@ import androidx.viewpager.widget.ViewPager
 import com.hujiejeff.musicplayer.OnPlayerEventListener
 import com.hujiejeff.musicplayer.R
 import com.hujiejeff.musicplayer.base.BaseFragment
-import com.hujiejeff.musicplayer.entity.Music
-import com.hujiejeff.musicplayer.entity.PlayMode
+import com.hujiejeff.musicplayer.data.entity.Music
+import com.hujiejeff.musicplayer.data.entity.PlayMode
 import com.hujiejeff.musicplayer.service.AudioPlayer
-import com.hujiejeff.musicplayer.storage.Preference
+import com.hujiejeff.musicplayer.data.Preference
 import com.hujiejeff.musicplayer.util.*
 import kotlinx.android.synthetic.main.card_album.view.*
 import kotlinx.android.synthetic.main.fragment_music_play.*

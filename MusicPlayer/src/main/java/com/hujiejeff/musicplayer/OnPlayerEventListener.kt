@@ -1,6 +1,6 @@
 package com.hujiejeff.musicplayer
 
-import com.hujiejeff.musicplayer.entity.Music
+import com.hujiejeff.musicplayer.data.entity.Music
 
 interface OnPlayerEventListener {
     /*

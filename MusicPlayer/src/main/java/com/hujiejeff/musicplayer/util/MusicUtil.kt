@@ -9,9 +9,9 @@ import android.provider.BaseColumns
 import android.provider.MediaStore
 import com.hujiejeff.musicplayer.R
 import com.hujiejeff.musicplayer.base.App
-import com.hujiejeff.musicplayer.entity.Album
-import com.hujiejeff.musicplayer.entity.Artist
-import com.hujiejeff.musicplayer.entity.Music
+import com.hujiejeff.musicplayer.data.entity.Album
+import com.hujiejeff.musicplayer.data.entity.Artist
+import com.hujiejeff.musicplayer.data.entity.Music
 import java.lang.Exception
 
 private val musicUri = MediaStore.Audio.Media.EXTERNAL_CONTENT_URI
@@ -65,7 +65,7 @@ fun getMusicList(): MutableList<Music> {
 }
 
 
-fun getAlbumList(): List<Album> {
+fun getAlbumList(): MutableList<Album> {
     val albumList = mutableListOf<Album>()
     val cursor = queryAll(albumUri, arrayOf(ALBUM, _ID, ARTIST)) ?: return albumList
     while (cursor.moveToNext()) {
@@ -80,7 +80,7 @@ fun getAlbumList(): List<Album> {
     return albumList
 }
 
-fun getArtistList(): List<Artist> {
+fun getArtistList(): MutableList<Artist> {
     val artistList = mutableListOf<Artist>()
     val cursor = queryAll(artistUri, arrayOf(ARTIST, _ID)) ?: return artistList
     while (cursor.moveToNext()) {

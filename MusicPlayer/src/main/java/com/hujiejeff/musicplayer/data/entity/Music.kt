@@ -1,4 +1,4 @@
-package com.hujiejeff.musicplayer.entity
+package com.hujiejeff.musicplayer.data.entity
 
 data class Music(
     val artist: String,

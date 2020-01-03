@@ -11,8 +11,8 @@ import android.widget.RemoteViews
 import androidx.core.app.NotificationCompat
 import com.hujiejeff.musicplayer.MainActivity
 import com.hujiejeff.musicplayer.R
-import com.hujiejeff.musicplayer.constans.EXTRA_NOTIFICATON
-import com.hujiejeff.musicplayer.entity.Music
+import com.hujiejeff.musicplayer.constans.EXTRA_NOTIFICATION
+import com.hujiejeff.musicplayer.data.entity.Music
 import com.hujiejeff.musicplayer.service.PlayService
 import com.hujiejeff.musicplayer.util.getCover
 
@@ -74,7 +74,7 @@ class Notifier {
     ): Notification {
         val intent = Intent(context, MainActivity::class.java).apply {
             action = Intent.ACTION_VIEW
-            putExtra(EXTRA_NOTIFICATON, true)
+            putExtra(EXTRA_NOTIFICATION, true)
             addFlags(Intent.FLAG_ACTIVITY_SINGLE_TOP)
         }
         val pi = PendingIntent.getActivity(context, 1, intent, PendingIntent.FLAG_UPDATE_CURRENT)

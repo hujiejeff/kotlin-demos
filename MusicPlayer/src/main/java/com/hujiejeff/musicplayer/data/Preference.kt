@@ -1,4 +1,4 @@
-package com.hujiejeff.musicplayer.storage
+package com.hujiejeff.musicplayer.data
 
 import android.content.Context
 import android.content.SharedPreferences
@@ -14,13 +14,22 @@ object Preference {
     }
 
     var play_mode
-        set(value) = setInt(PLAY_MODE, value)
+        set(value) = setInt(
+            PLAY_MODE,
+            value
+        )
         get() = getInt(PLAY_MODE)
     var play_position
-        set(value) = setInt(PLAY_POSITION, value)
+        set(value) = setInt(
+            PLAY_POSITION,
+            value
+        )
         get() = getInt(PLAY_POSITION)
     var play_progress
-        set(value) = setInt(PLAY_PROGRESS, value)
+        set(value) = setInt(
+            PLAY_PROGRESS,
+            value
+        )
         get() = getInt(PLAY_PROGRESS)
 
     private fun setString(key: String, value: String) {

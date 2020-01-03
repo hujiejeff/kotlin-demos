@@ -1,4 +1,4 @@
-package com.hujiejeff.musicplayer.entity
+package com.hujiejeff.musicplayer.data.entity
 
 enum class PlayMode(val value: Int) {
     SINGLE(0), LOOP(1), SINGLE_LOOP(2), SHUFFLE(3);

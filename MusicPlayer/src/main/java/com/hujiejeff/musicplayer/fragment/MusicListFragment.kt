@@ -11,7 +11,7 @@ import com.hujiejeff.musicplayer.R
 import com.hujiejeff.musicplayer.base.BaseRecyclerViewAdapter
 import com.hujiejeff.musicplayer.base.BaseFragment
 import com.hujiejeff.musicplayer.base.BaseViewHolder
-import com.hujiejeff.musicplayer.entity.Music
+import com.hujiejeff.musicplayer.data.entity.Music
 import com.hujiejeff.musicplayer.service.AudioPlayer
 import com.hujiejeff.musicplayer.util.getCover
 import com.hujiejeff.musicplayer.util.getMusicList
