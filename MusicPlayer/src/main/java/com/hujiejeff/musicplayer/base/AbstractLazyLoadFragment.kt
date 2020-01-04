@@ -1,5 +1,6 @@
 package com.hujiejeff.musicplayer.base
 
+import PermissionReq
 import android.os.Bundle
 import android.view.View
 import androidx.fragment.app.Fragment
@@ -53,9 +54,26 @@ abstract class AbstractLazyLoadFragment: Fragment() {
     }
 
 
-    protected fun onLazyLoadData() {
+    private fun onLazyLoadData() {
+        //请求权限
+        PermissionReq
+            .with(this)
+            .permissions(*getPermissions())
+            .result(object : PermissionReq.Result {
+                override fun onGranted() {
+                    onLoadData()
+                }
 
+                override fun onDenied() {
+                    onPermissionFailed()
+                }
+
+            }).request()
     }
+
+    protected abstract fun onLoadData()
+    protected abstract fun onPermissionFailed()
+    protected abstract fun getPermissions(): Array<String>
 
     override fun onDestroyView() {
         super.onDestroyView()
