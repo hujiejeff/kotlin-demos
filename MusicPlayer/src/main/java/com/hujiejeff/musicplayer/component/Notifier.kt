@@ -9,7 +9,7 @@ import android.content.Intent
 import android.os.Build
 import android.widget.RemoteViews
 import androidx.core.app.NotificationCompat
-import com.hujiejeff.musicplayer.MainActivity
+import com.hujiejeff.musicplayer.localmusic.LocalMusicActivity
 import com.hujiejeff.musicplayer.R
 import com.hujiejeff.musicplayer.constans.EXTRA_NOTIFICATION
 import com.hujiejeff.musicplayer.data.entity.Music
@@ -72,7 +72,7 @@ class Notifier {
         music: Music,
         isPlaying: Boolean
     ): Notification {
-        val intent = Intent(context, MainActivity::class.java).apply {
+        val intent = Intent(context, LocalMusicActivity::class.java).apply {
             action = Intent.ACTION_VIEW
             putExtra(EXTRA_NOTIFICATION, true)
             addFlags(Intent.FLAG_ACTIVITY_SINGLE_TOP)

@@ -1,4 +1,4 @@
-package com.hujiejeff.musicplayer
+package com.hujiejeff.musicplayer.service
 
 import com.hujiejeff.musicplayer.data.entity.Music
 

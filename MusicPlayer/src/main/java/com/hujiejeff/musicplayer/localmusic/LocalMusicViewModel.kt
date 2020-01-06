@@ -3,7 +3,7 @@ package com.hujiejeff.musicplayer.localmusic
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
-import com.hujiejeff.musicplayer.OnPlayerEventListener
+import com.hujiejeff.musicplayer.service.OnPlayerEventListener
 import com.hujiejeff.musicplayer.base.App
 import com.hujiejeff.musicplayer.data.Preference
 import com.hujiejeff.musicplayer.data.entity.*

@@ -1,4 +1,4 @@
-package com.hujiejeff.musicplayer.fragment
+package com.hujiejeff.musicplayer.localmusic.fragment
 
 import android.content.Context
 import android.os.Bundle
@@ -10,7 +10,7 @@ import androidx.fragment.app.Fragment
 import androidx.fragment.app.FragmentPagerAdapter
 import androidx.lifecycle.Observer
 import androidx.viewpager.widget.ViewPager
-import com.hujiejeff.musicplayer.MainActivity
+import com.hujiejeff.musicplayer.localmusic.LocalMusicActivity
 import com.hujiejeff.musicplayer.R
 import com.hujiejeff.musicplayer.base.BaseFragment
 import com.hujiejeff.musicplayer.data.entity.Music
@@ -28,7 +28,7 @@ class MusicPlayFragment : BaseFragment(), SeekBar.OnSeekBarChangeListener {
 
     private var isFirst = true
 
-    private lateinit var mainActivity: MainActivity
+    private lateinit var localMusicActivity: LocalMusicActivity
     private lateinit var viewModel: LocalMusicViewModel
 
     override fun getLayoutId() = R.layout.fragment_music_play
@@ -79,8 +79,8 @@ class MusicPlayFragment : BaseFragment(), SeekBar.OnSeekBarChangeListener {
 
     override fun onAttach(context: Context) {
         super.onAttach(context)
-        mainActivity = context as MainActivity
-        viewModel = mainActivity.obtainViewModel()
+        localMusicActivity = context as LocalMusicActivity
+        viewModel = localMusicActivity.obtainViewModel()
         subscribe()
     }
 
@@ -118,23 +118,23 @@ class MusicPlayFragment : BaseFragment(), SeekBar.OnSeekBarChangeListener {
     private fun subscribe() {
         viewModel.apply {
             //music change
-            currentMusic.observe(mainActivity, Observer {
+            currentMusic.observe(localMusicActivity, Observer {
                 view?.updateUI(it)
             })
 
             //music state
-            isPlay.observe(mainActivity, Observer {
+            isPlay.observe(localMusicActivity, Observer {
                 view?.iv_play_btn_play?.isSelected = it
             })
 
             //music progress
-            playProgress.observe(mainActivity, Observer {
+            playProgress.observe(localMusicActivity, Observer {
                 view?.seek_bar?.progress = it
                 view?.tv_current_time?.text = getMusicTimeFormatString(it)
             })
 
             //music mode
-            playMode.observe(mainActivity, Observer {
+            playMode.observe(localMusicActivity, Observer {
                 when (it) {
                     PlayMode.SINGLE, PlayMode.LOOP, PlayMode.SINGLE_LOOP -> {
                         view?.iv_play_mode_loop?.setImageLevel(it.value)

@@ -8,7 +8,6 @@ import android.media.MediaPlayer
 import android.os.Build
 import android.os.Handler
 import android.os.Looper
-import com.hujiejeff.musicplayer.OnPlayerEventListener
 import com.hujiejeff.musicplayer.component.Notifier
 import com.hujiejeff.musicplayer.data.entity.Music
 import com.hujiejeff.musicplayer.data.entity.PlayMode

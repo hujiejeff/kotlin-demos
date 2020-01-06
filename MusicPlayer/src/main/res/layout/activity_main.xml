@@ -5,7 +5,7 @@
     android:id="@+id/drawer_layout"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".MainActivity">
+    tools:context=".localmusic.LocalMusicActivity">
     <include layout="@layout/include_activity_main"/>
     <com.google.android.material.navigation.NavigationView
         android:fitsSystemWindows="false"

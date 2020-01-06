@@ -1,4 +1,4 @@
-package com.hujiejeff.musicplayer.fragment
+package com.hujiejeff.musicplayer.localmusic.fragment
 
 import android.Manifest
 import android.content.Context
@@ -9,8 +9,9 @@ import androidx.lifecycle.Observer
 import androidx.recyclerview.widget.DefaultItemAnimator
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
-import com.hujiejeff.musicplayer.MainActivity
+import com.hujiejeff.musicplayer.localmusic.LocalMusicActivity
 import com.hujiejeff.musicplayer.R
+import com.hujiejeff.musicplayer.base.AbstractLazyLoadFragment
 import com.hujiejeff.musicplayer.base.BaseRecyclerViewAdapter
 import com.hujiejeff.musicplayer.base.BaseFragment
 import com.hujiejeff.musicplayer.base.BaseViewHolder
@@ -25,7 +26,7 @@ import kotlinx.android.synthetic.main.item_music_list.view.*
 class MusicListFragment : BaseFragment() {
 
     private val musicList: MutableList<Music> = mutableListOf()
-    private lateinit var mainActivity: MainActivity
+    private lateinit var localMusicActivity: LocalMusicActivity
     private lateinit var viewModel: LocalMusicViewModel
 
     override fun getLayoutId(): Int = R.layout.fragment_list
@@ -43,25 +44,29 @@ class MusicListFragment : BaseFragment() {
 
     override fun onAttach(context: Context) {
         super.onAttach(context)
-        mainActivity = activity as MainActivity
-        viewModel = mainActivity.obtainViewModel()
+        localMusicActivity = activity as LocalMusicActivity
+        viewModel = localMusicActivity.obtainViewModel()
         subscribe()
     }
 
     private fun subscribe() {
         viewModel.apply {
-            musicItems.observe(mainActivity, Observer<List<Music>> { list ->
+            musicItems.observe(localMusicActivity, Observer<List<Music>> { list ->
                 musicList.addAll(list)
                 view?.rv_list?.adapter?.notifyDataSetChanged()
                 logD("observer")
                 viewModel.loadDefaultMusic()
             })
 
-            isDataLoadingError.observe(mainActivity, Observer { isError ->
-                if (isError) Toast.makeText(mainActivity, "load error", Toast.LENGTH_SHORT).show()
+            isDataLoadingError.observe(localMusicActivity, Observer { isError ->
+                if (isError) Toast.makeText(
+                    localMusicActivity,
+                    "load error",
+                    Toast.LENGTH_SHORT
+                ).show()
             })
 
-            dataLoading.observe(mainActivity, Observer {isLoading ->
+            dataLoading.observe(localMusicActivity, Observer { isLoading ->
                 view?.rv_list?.visibility = if (isLoading) View.INVISIBLE else View.VISIBLE
                 if (isLoading) {
                     view?.progressBar?.show()

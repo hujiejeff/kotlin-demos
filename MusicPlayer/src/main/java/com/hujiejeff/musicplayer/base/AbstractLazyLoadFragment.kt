@@ -2,7 +2,9 @@ package com.hujiejeff.musicplayer.base
 
 import PermissionReq
 import android.os.Bundle
+import android.view.LayoutInflater
 import android.view.View
+import android.view.ViewGroup
 import androidx.fragment.app.Fragment
 
 /**
@@ -12,6 +14,16 @@ abstract class AbstractLazyLoadFragment: Fragment() {
     private var isViewCreated = false
     private var isLoadedData = false
     private var isFirstVisible = true
+
+    override fun onCreateView(
+        inflater: LayoutInflater,
+        container: ViewGroup?,
+        savedInstanceState: Bundle?
+    ): View? {
+        val view = inflater.inflate(getLayoutId(), container, false)
+        initView(view)
+        return view
+    }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
@@ -71,6 +83,9 @@ abstract class AbstractLazyLoadFragment: Fragment() {
             }).request()
     }
 
+
+    protected abstract fun getLayoutId(): Int
+    protected abstract fun initView(view: View)
     protected abstract fun onLoadData()
     protected abstract fun onPermissionFailed()
     protected abstract fun getPermissions(): Array<String>

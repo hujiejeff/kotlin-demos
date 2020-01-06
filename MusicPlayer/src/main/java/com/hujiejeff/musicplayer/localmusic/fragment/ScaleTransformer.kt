@@ -1,4 +1,4 @@
-package com.hujiejeff.musicplayer.fragment
+package com.hujiejeff.musicplayer.localmusic.fragment
 
 import android.view.View
 import androidx.viewpager.widget.ViewPager

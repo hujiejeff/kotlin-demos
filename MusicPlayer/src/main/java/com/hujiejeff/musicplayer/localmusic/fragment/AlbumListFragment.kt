@@ -1,5 +1,6 @@
-package com.hujiejeff.musicplayer.fragment
+package com.hujiejeff.musicplayer.localmusic.fragment
 
+import PermissionReq
 import android.Manifest
 import android.content.Context
 import android.os.Bundle
@@ -7,28 +8,28 @@ import android.view.View
 import android.widget.Toast
 import androidx.lifecycle.Observer
 import androidx.recyclerview.widget.GridLayoutManager
-import com.hujiejeff.musicplayer.MainActivity
+import com.hujiejeff.musicplayer.localmusic.LocalMusicActivity
 import com.hujiejeff.musicplayer.R
 import com.hujiejeff.musicplayer.base.BaseFragment
 import com.hujiejeff.musicplayer.base.BaseRecyclerViewAdapter
 import com.hujiejeff.musicplayer.base.BaseViewHolder
-import com.hujiejeff.musicplayer.data.entity.Artist
+import com.hujiejeff.musicplayer.data.entity.Album
 import com.hujiejeff.musicplayer.localmusic.LocalMusicViewModel
-import com.hujiejeff.musicplayer.util.getArtistCover
+import com.hujiejeff.musicplayer.util.loadCover
 import kotlinx.android.synthetic.main.fragment_list.view.*
-import kotlinx.android.synthetic.main.item_artist_list.view.*
+import kotlinx.android.synthetic.main.item_album_list.view.*
 
-class ArtistListFragment : BaseFragment() {
-    private val artistList: MutableList<Artist> = mutableListOf()
+class AlbumListFragment: BaseFragment() {
+    private val albumList: MutableList<Album> = mutableListOf()
     private val spanCount = 2
-    private lateinit var mainActivity: MainActivity
+    private lateinit var localMusicActivity: LocalMusicActivity
     private lateinit var viewModel: LocalMusicViewModel
 
     override fun getLayoutId(): Int = R.layout.fragment_list
 
     override fun initView(view: View) {
         view.rv_list.apply {
-            adapter = ArtistRecycleViewAdapter().apply {
+            adapter = AlbumRecycleViewAdapter().apply {
                 setOnItemClickListener {
                 }
             }
@@ -36,24 +37,23 @@ class ArtistListFragment : BaseFragment() {
         }
     }
 
-
     override fun onAttach(context: Context) {
         super.onAttach(context)
-        mainActivity = context as MainActivity
-        viewModel = mainActivity.obtainViewModel()
+        localMusicActivity = context as LocalMusicActivity
+        viewModel = localMusicActivity.obtainViewModel()
         subscribe()
     }
 
     private fun subscribe() {
-        viewModel.artistItems.observe(mainActivity, Observer {
-            artistList.addAll(it)
+        viewModel.albumItems.observe(localMusicActivity, Observer {
+            albumList.addAll(it)
             view?.rv_list?.adapter?.notifyDataSetChanged()
         })
     }
 
     override fun onActivityCreated(savedInstanceState: Bundle?) {
         super.onActivityCreated(savedInstanceState)
-        if (artistList.isEmpty()) {
+        if (albumList.isEmpty()) {
             loadAlbumList()
         }
     }
@@ -67,9 +67,8 @@ class ArtistListFragment : BaseFragment() {
             )
             .result(object : PermissionReq.Result {
                 override fun onGranted() {
-                    viewModel.loadArtistList()
+                    viewModel.loadAlbumList()
                 }
-
                 override fun onDenied() {
                     Toast.makeText(context, "permission deny", Toast.LENGTH_SHORT).show()
                 }
@@ -77,12 +76,12 @@ class ArtistListFragment : BaseFragment() {
             .request()
     }
 
-    inner class ArtistRecycleViewAdapter :
-        BaseRecyclerViewAdapter<Artist>(context, R.layout.item_artist_list, artistList) {
-        override fun convert(holder: BaseViewHolder, data: Artist) {
+    inner class AlbumRecycleViewAdapter: BaseRecyclerViewAdapter<Album>(context, R.layout.item_album_list, albumList) {
+        override fun convert(holder: BaseViewHolder, data: Album) {
             holder.itemView.apply {
-                artist_cover.setImageBitmap(getArtistCover())
-                artist_name.text = data.name
+                album_title.text = data.title
+                album_artist.text = data.artist
+                album_cover.loadCover(data.id)
             }
         }
     }

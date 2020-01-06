@@ -1,4 +1,4 @@
-package com.hujiejeff.musicplayer
+package com.hujiejeff.musicplayer.localmusic
 
 import android.content.ComponentName
 import android.content.Context
@@ -14,21 +14,21 @@ import androidx.core.view.GravityCompat
 import androidx.fragment.app.FragmentPagerAdapter
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProviders
+import com.hujiejeff.musicplayer.R
 import com.hujiejeff.musicplayer.base.BaseActivity
 import com.hujiejeff.musicplayer.data.Preference
 import com.hujiejeff.musicplayer.data.entity.Music
-import com.hujiejeff.musicplayer.fragment.AlbumListFragment
-import com.hujiejeff.musicplayer.fragment.ArtistListFragment
-import com.hujiejeff.musicplayer.fragment.MusicListFragment
-import com.hujiejeff.musicplayer.fragment.MusicPlayFragment
-import com.hujiejeff.musicplayer.localmusic.LocalMusicViewModel
+import com.hujiejeff.musicplayer.localmusic.fragment.AlbumListFragment
+import com.hujiejeff.musicplayer.localmusic.fragment.ArtistListFragment
+import com.hujiejeff.musicplayer.localmusic.fragment.MusicListFragment
+import com.hujiejeff.musicplayer.localmusic.fragment.MusicPlayFragment
 import com.hujiejeff.musicplayer.service.PlayService
 import com.hujiejeff.musicplayer.util.*
 import kotlinx.android.synthetic.main.activity_main.*
 import kotlinx.android.synthetic.main.include_activity_main.*
 import kotlinx.android.synthetic.main.include_play_bar.*
 
-class MainActivity : BaseActivity() {
+class LocalMusicActivity : BaseActivity() {
     private val fragmentList =
         listOf(MusicListFragment(), AlbumListFragment(), ArtistListFragment())
     private val titleList by lazy {
@@ -98,7 +98,7 @@ class MainActivity : BaseActivity() {
     private fun subscribe() {
         viewModel = obtainViewModel().apply {
             //music onchange
-            currentMusic.observe(this@MainActivity, Observer<Music> { music ->
+            currentMusic.observe(this@LocalMusicActivity, Observer<Music> { music ->
                 tv_play_bar_title.text = music.title
                 tv_play_bar_artist.text = music.artist
                 iv_play_bar_cover.loadCover(music.albumID)
@@ -107,17 +107,17 @@ class MainActivity : BaseActivity() {
             })
 
             //music state
-            isPlay.observe(this@MainActivity, Observer<Boolean> { state ->
+            isPlay.observe(this@LocalMusicActivity, Observer<Boolean> { state ->
                 iv_play_bar_play.isSelected = state
             })
 
             //music progress
-            playProgress.observe(this@MainActivity, Observer<Int> { progress ->
+            playProgress.observe(this@LocalMusicActivity, Observer<Int> { progress ->
                 pb_play_bar.progress = progress
             })
 
             //play fragment open or close
-            isPlayFragmentShow.observe(this@MainActivity, Observer<Boolean> { isShow ->
+            isPlayFragmentShow.observe(this@LocalMusicActivity, Observer<Boolean> { isShow ->
                 transparentStatusBar(isShow)
                 if (isShow) {
                     openMusicPlayFragment()
