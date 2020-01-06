@@ -9,22 +9,21 @@ import android.os.Build
 import android.os.Bundle
 import android.os.IBinder
 import android.os.SystemClock
-import android.view.Gravity
 import android.widget.Toast
 import androidx.core.view.GravityCompat
 import androidx.fragment.app.FragmentPagerAdapter
+import androidx.lifecycle.Observer
+import androidx.lifecycle.ViewModelProviders
 import com.hujiejeff.musicplayer.base.BaseActivity
+import com.hujiejeff.musicplayer.data.Preference
 import com.hujiejeff.musicplayer.data.entity.Music
 import com.hujiejeff.musicplayer.fragment.AlbumListFragment
 import com.hujiejeff.musicplayer.fragment.ArtistListFragment
 import com.hujiejeff.musicplayer.fragment.MusicListFragment
 import com.hujiejeff.musicplayer.fragment.MusicPlayFragment
-import com.hujiejeff.musicplayer.service.AudioPlayer
+import com.hujiejeff.musicplayer.localmusic.LocalMusicViewModel
 import com.hujiejeff.musicplayer.service.PlayService
-import com.hujiejeff.musicplayer.util.checkAndroidVersionAction
-import com.hujiejeff.musicplayer.util.logD
-import com.hujiejeff.musicplayer.util.setTransparentStatusBar
-import com.hujiejeff.musicplayer.util.transaction
+import com.hujiejeff.musicplayer.util.*
 import kotlinx.android.synthetic.main.activity_main.*
 import kotlinx.android.synthetic.main.include_activity_main.*
 import kotlinx.android.synthetic.main.include_play_bar.*
@@ -46,42 +45,101 @@ class MainActivity : BaseActivity() {
     private var firstBackPressTime = 0L
     private var secondBackPressTime = 1L
 
-    private lateinit var controlPanel: ControlPanel
+    private lateinit var viewModel: LocalMusicViewModel
 
 
     override fun layoutResId() = R.layout.activity_main
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         logD("onCreate")
+        initView()
+        bindService()
+        initClickListener()
+        subscribe()
+    }
+
+    private fun initView() {
         tab_layout.apply {
             setTabTextColors(Color.BLACK, Color.WHITE)
             setupWithViewPager(view_pager)
         }
-
         view_pager.adapter = PagerAdapter()
-        play_bar.setOnClickListener {
-            openMusicPlayFragment()
-        }
-        controlPanel = ControlPanel(play_bar)
+        checkAndroidVersionAction(Build.VERSION_CODES.M, {
+            window.setTransparentStatusBar(false)
+        })
+    }
+
+    private fun bindService() {
         val bindIntent = Intent(this, PlayService::class.java)
         val serviceConnection = object : ServiceConnection {
             override fun onServiceDisconnected(p0: ComponentName?) {
             }
 
             override fun onServiceConnected(p0: ComponentName?, p1: IBinder?) {
-                AudioPlayer.INSTANCE.addOnPlayerEventListener(controlPanel)
             }
         }
         bindService(bindIntent, serviceConnection, Context.BIND_AUTO_CREATE)
+    }
 
+    private fun initClickListener() {
+        play_bar.setOnClickListener {
+            viewModel.showOrHidePlayFragment()
+        }
+
+        iv_play_bar_play.setOnClickListener {
+            viewModel.playOrPause()
+        }
+
+        iv_play_bar_next.setOnClickListener {
+            viewModel.next()
+        }
+    }
+
+    private fun subscribe() {
+        viewModel = obtainViewModel().apply {
+            //music onchange
+            currentMusic.observe(this@MainActivity, Observer<Music> { music ->
+                tv_play_bar_title.text = music.title
+                tv_play_bar_artist.text = music.artist
+                iv_play_bar_cover.loadCover(music.albumID)
+                pb_play_bar.max = music.duration.toInt()
+                pb_play_bar.progress = if (!isPlay.value!!) Preference.play_progress else 0
+            })
+
+            //music state
+            isPlay.observe(this@MainActivity, Observer<Boolean> { state ->
+                iv_play_bar_play.isSelected = state
+            })
+
+            //music progress
+            playProgress.observe(this@MainActivity, Observer<Int> { progress ->
+                pb_play_bar.progress = progress
+            })
+
+            //play fragment open or close
+            isPlayFragmentShow.observe(this@MainActivity, Observer<Boolean> { isShow ->
+                transparentStatusBar(isShow)
+                if (isShow) {
+                    openMusicPlayFragment()
+                } else {
+                    hideMusicPlayFragment()
+                }
+            })
+            //start
+            start()
+        }
+    }
+
+
+    private fun transparentStatusBar(show: Boolean) {
         checkAndroidVersionAction(Build.VERSION_CODES.M, {
-            window.setTransparentStatusBar(false)
+            window.setTransparentStatusBar(show)
         })
     }
 
     override fun onBackPressed() {
         if (isShowMusicPlay) {
-            hideMusicPlayFragment()
+            viewModel.showOrHidePlayFragment()
             return
         }
         if (drawer_layout.isDrawerOpen(GravityCompat.START)) {
@@ -126,9 +184,8 @@ class MainActivity : BaseActivity() {
         }
     }
 
-    fun loadControlPanel() {
-        controlPanel.loadMusic()
-    }
+    fun obtainViewModel(): LocalMusicViewModel =
+        ViewModelProviders.of(this).get(LocalMusicViewModel::class.java)
 
 
     inner class PagerAdapter :

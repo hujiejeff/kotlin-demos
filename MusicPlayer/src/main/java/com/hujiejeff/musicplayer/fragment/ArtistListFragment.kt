@@ -1,23 +1,28 @@
 package com.hujiejeff.musicplayer.fragment
 
 import android.Manifest
+import android.content.Context
 import android.os.Bundle
 import android.view.View
 import android.widget.Toast
+import androidx.lifecycle.Observer
 import androidx.recyclerview.widget.GridLayoutManager
+import com.hujiejeff.musicplayer.MainActivity
 import com.hujiejeff.musicplayer.R
 import com.hujiejeff.musicplayer.base.BaseFragment
 import com.hujiejeff.musicplayer.base.BaseRecyclerViewAdapter
 import com.hujiejeff.musicplayer.base.BaseViewHolder
 import com.hujiejeff.musicplayer.data.entity.Artist
+import com.hujiejeff.musicplayer.localmusic.LocalMusicViewModel
 import com.hujiejeff.musicplayer.util.getArtistCover
-import com.hujiejeff.musicplayer.util.getArtistList
 import kotlinx.android.synthetic.main.fragment_list.view.*
 import kotlinx.android.synthetic.main.item_artist_list.view.*
 
 class ArtistListFragment : BaseFragment() {
     private val artistList: MutableList<Artist> = mutableListOf()
     private val spanCount = 2
+    private lateinit var mainActivity: MainActivity
+    private lateinit var viewModel: LocalMusicViewModel
 
     override fun getLayoutId(): Int = R.layout.fragment_list
 
@@ -29,6 +34,21 @@ class ArtistListFragment : BaseFragment() {
             }
             layoutManager = GridLayoutManager(context, spanCount)
         }
+    }
+
+
+    override fun onAttach(context: Context) {
+        super.onAttach(context)
+        mainActivity = context as MainActivity
+        viewModel = mainActivity.obtainViewModel()
+        subscribe()
+    }
+
+    private fun subscribe() {
+        viewModel.artistItems.observe(mainActivity, Observer {
+            artistList.addAll(it)
+            view?.rv_list?.adapter?.notifyDataSetChanged()
+        })
     }
 
     override fun onActivityCreated(savedInstanceState: Bundle?) {
@@ -47,8 +67,7 @@ class ArtistListFragment : BaseFragment() {
             )
             .result(object : PermissionReq.Result {
                 override fun onGranted() {
-                    artistList.addAll(getArtistList())
-                    view?.rv_list?.adapter?.notifyDataSetChanged()
+                    viewModel.loadArtistList()
                 }
 
                 override fun onDenied() {

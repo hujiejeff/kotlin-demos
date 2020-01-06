@@ -1,20 +1,21 @@
 package com.hujiejeff.musicplayer.fragment
 
 import android.Manifest
+import android.content.Context
 import android.os.Bundle
 import android.view.View
 import android.widget.Toast
+import androidx.lifecycle.Observer
 import androidx.recyclerview.widget.DefaultItemAnimator
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.hujiejeff.musicplayer.MainActivity
 import com.hujiejeff.musicplayer.R
-import com.hujiejeff.musicplayer.base.App
 import com.hujiejeff.musicplayer.base.BaseRecyclerViewAdapter
 import com.hujiejeff.musicplayer.base.BaseFragment
 import com.hujiejeff.musicplayer.base.BaseViewHolder
 import com.hujiejeff.musicplayer.data.entity.Music
-import com.hujiejeff.musicplayer.data.source.LocalDataSource
+import com.hujiejeff.musicplayer.localmusic.LocalMusicViewModel
 import com.hujiejeff.musicplayer.service.AudioPlayer
 import com.hujiejeff.musicplayer.util.loadCover
 import com.hujiejeff.musicplayer.util.logD
@@ -25,10 +26,10 @@ class MusicListFragment : BaseFragment() {
 
     private val musicList: MutableList<Music> = mutableListOf()
     private lateinit var mainActivity: MainActivity
+    private lateinit var viewModel: LocalMusicViewModel
 
     override fun getLayoutId(): Int = R.layout.fragment_list
     override fun initView(view: View) {
-        logD(view.rv_list.toString())
         view.rv_list.apply {
             adapter = MusicRecyclerViewAdapter().apply {
                 setOnItemClickListener {
@@ -40,9 +41,39 @@ class MusicListFragment : BaseFragment() {
         }
     }
 
+    override fun onAttach(context: Context) {
+        super.onAttach(context)
+        mainActivity = activity as MainActivity
+        viewModel = mainActivity.obtainViewModel()
+        subscribe()
+    }
+
+    private fun subscribe() {
+        viewModel.apply {
+            musicItems.observe(mainActivity, Observer<List<Music>> { list ->
+                musicList.addAll(list)
+                view?.rv_list?.adapter?.notifyDataSetChanged()
+                logD("observer")
+                viewModel.loadDefaultMusic()
+            })
+
+            isDataLoadingError.observe(mainActivity, Observer { isError ->
+                if (isError) Toast.makeText(mainActivity, "load error", Toast.LENGTH_SHORT).show()
+            })
+
+            dataLoading.observe(mainActivity, Observer {isLoading ->
+                view?.rv_list?.visibility = if (isLoading) View.INVISIBLE else View.VISIBLE
+                if (isLoading) {
+                    view?.progressBar?.show()
+                } else {
+                    view?.progressBar?.hide()
+                }
+            })
+        }
+    }
+
     override fun onActivityCreated(savedInstanceState: Bundle?) {
         super.onActivityCreated(savedInstanceState)
-        mainActivity = activity as MainActivity
         if (musicList.isEmpty()) {
             loadMusicList()
         }
@@ -57,19 +88,9 @@ class MusicListFragment : BaseFragment() {
             )
             .result(object : PermissionReq.Result {
                 override fun onGranted() {
-                    App.dateRepository.getLocalMusicList(object: LocalDataSource.Callback<Music>{
-                        override fun onLoaded(dataList: MutableList<Music>) {
-                            musicList.addAll(dataList)
-                            AudioPlayer.INSTANCE.mMusicList = musicList
-                            view?.rv_list?.adapter?.notifyDataSetChanged()
-                            mainActivity.loadControlPanel()
-                        }
-
-                        override fun onFailed(mes: String) {
-                            Toast.makeText(context, mes, Toast.LENGTH_SHORT).show()
-                        }
-                    })
+                    viewModel.loadMusicList()
                 }
+
                 override fun onDenied() {
                     Toast.makeText(context, "permission deny", Toast.LENGTH_SHORT).show()
                 }
@@ -77,7 +98,8 @@ class MusicListFragment : BaseFragment() {
             .request()
     }
 
-    inner class MusicRecyclerViewAdapter : BaseRecyclerViewAdapter<Music>(context, R.layout.item_music_list, musicList) {
+    inner class MusicRecyclerViewAdapter :
+        BaseRecyclerViewAdapter<Music>(context, R.layout.item_music_list, musicList) {
         override fun convert(holder: BaseViewHolder, data: Music) {
             holder.itemView.apply {
                 tv_music_title.text = data.title

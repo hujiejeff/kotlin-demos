@@ -1,14 +1,12 @@
 package com.hujiejeff.musicplayer.util
 
 import android.content.ContentUris
-import android.content.Context
 import android.database.Cursor
 import android.graphics.Bitmap
 import android.graphics.BitmapFactory
 import android.net.Uri
 import android.provider.BaseColumns
 import android.provider.MediaStore
-import android.view.View
 import android.widget.ImageView
 import com.bumptech.glide.Glide
 import com.hujiejeff.musicplayer.R
@@ -64,7 +62,7 @@ fun getMusicList(): MutableList<Music> {
         }
     }
     cursor.close()
-    logD(musicList.toString())
+    logD("getMusicList$musicList")
     return musicList
 }
 

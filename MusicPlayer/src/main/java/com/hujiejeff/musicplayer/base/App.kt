@@ -36,6 +36,7 @@ class App : Application() {
         //TODO 权限问题 ok
         //TODO 线程池集成 ok
         //TODO 当没有音乐的时候 ok
+        //TODO MVVM重构
 
 
 

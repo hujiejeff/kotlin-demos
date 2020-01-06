@@ -2,16 +2,19 @@ package com.hujiejeff.musicplayer.fragment
 
 import PermissionReq
 import android.Manifest
+import android.content.Context
 import android.os.Bundle
 import android.view.View
 import android.widget.Toast
+import androidx.lifecycle.Observer
 import androidx.recyclerview.widget.GridLayoutManager
+import com.hujiejeff.musicplayer.MainActivity
 import com.hujiejeff.musicplayer.R
 import com.hujiejeff.musicplayer.base.BaseFragment
 import com.hujiejeff.musicplayer.base.BaseRecyclerViewAdapter
 import com.hujiejeff.musicplayer.base.BaseViewHolder
 import com.hujiejeff.musicplayer.data.entity.Album
-import com.hujiejeff.musicplayer.util.getAlbumList
+import com.hujiejeff.musicplayer.localmusic.LocalMusicViewModel
 import com.hujiejeff.musicplayer.util.loadCover
 import kotlinx.android.synthetic.main.fragment_list.view.*
 import kotlinx.android.synthetic.main.item_album_list.view.*
@@ -19,6 +22,8 @@ import kotlinx.android.synthetic.main.item_album_list.view.*
 class AlbumListFragment: BaseFragment() {
     private val albumList: MutableList<Album> = mutableListOf()
     private val spanCount = 2
+    private lateinit var mainActivity: MainActivity
+    private lateinit var viewModel: LocalMusicViewModel
 
     override fun getLayoutId(): Int = R.layout.fragment_list
 
@@ -30,6 +35,20 @@ class AlbumListFragment: BaseFragment() {
             }
             layoutManager = GridLayoutManager(context, spanCount)
         }
+    }
+
+    override fun onAttach(context: Context) {
+        super.onAttach(context)
+        mainActivity = context as MainActivity
+        viewModel = mainActivity.obtainViewModel()
+        subscribe()
+    }
+
+    private fun subscribe() {
+        viewModel.albumItems.observe(mainActivity, Observer {
+            albumList.addAll(it)
+            view?.rv_list?.adapter?.notifyDataSetChanged()
+        })
     }
 
     override fun onActivityCreated(savedInstanceState: Bundle?) {
@@ -48,8 +67,7 @@ class AlbumListFragment: BaseFragment() {
             )
             .result(object : PermissionReq.Result {
                 override fun onGranted() {
-                    albumList.addAll(getAlbumList())
-                    view?.rv_list?.adapter?.notifyDataSetChanged()
+                    viewModel.loadAlbumList()
                 }
                 override fun onDenied() {
                     Toast.makeText(context, "permission deny", Toast.LENGTH_SHORT).show()

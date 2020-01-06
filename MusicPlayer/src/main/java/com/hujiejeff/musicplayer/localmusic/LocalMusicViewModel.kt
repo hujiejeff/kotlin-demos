@@ -4,17 +4,20 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import com.hujiejeff.musicplayer.OnPlayerEventListener
+import com.hujiejeff.musicplayer.base.App
 import com.hujiejeff.musicplayer.data.Preference
 import com.hujiejeff.musicplayer.data.entity.*
-import com.hujiejeff.musicplayer.data.source.DataRepository
 import com.hujiejeff.musicplayer.data.source.LocalDataSource
 import com.hujiejeff.musicplayer.service.AudioPlayer
+import com.hujiejeff.musicplayer.util.logD
 
 /**
  * Create by hujie on 2020/1/3
  */
-class LocalMusicViewModel(private val dataRepository: DataRepository) : ViewModel(),
+class LocalMusicViewModel : ViewModel(),
     OnPlayerEventListener {
+
+    private val dataRepository by lazy { App.dateRepository }
 
     private val player: AudioPlayer = AudioPlayer.INSTANCE
 
@@ -23,10 +26,12 @@ class LocalMusicViewModel(private val dataRepository: DataRepository) : ViewMode
     val dataLoading: LiveData<Boolean>
         get() = _dataLoading
     //错误提示
-    private val isDataLoadingError = MutableLiveData<Boolean>()
+    private val _isDataLoadingError = MutableLiveData<Boolean>()
+    val isDataLoadingError: LiveData<Boolean>
+        get() = _isDataLoadingError
 
     //音乐列表
-    private val _musicItems = MutableLiveData<List<Music>>().apply { value = emptyList() }
+    private val _musicItems = MutableLiveData<List<Music>>()
     val musicItems: LiveData<List<Music>>
         get() = _musicItems
 
@@ -62,59 +67,68 @@ class LocalMusicViewModel(private val dataRepository: DataRepository) : ViewMode
 
     //MusicPlayFragment状态
     private val _isShow = MutableLiveData<Boolean>().apply { value = false }
-    val isShow: LiveData<Boolean>
+    val isPlayFragmentShow: LiveData<Boolean>
         get() = _isShow
+
+    val playPosition get() = player.playPosition
 
     fun start() {
         //注册播放监听
         registerListener()
     }
 
+    fun loadDefaultMusic() {
+        logD("loadDefaultMusic---" + player.currentMusic.toString())
+        _currentMusic.value = player.currentMusic
+    }
+
     //加载音乐列表
-    private fun loadMusicList() {
+    fun loadMusicList() {
         _dataLoading.value = true
         dataRepository.getLocalMusicList(object : LocalDataSource.Callback<Music> {
             override fun onLoaded(dataList: MutableList<Music>) {
+                //因为是立即回调，所以要先设置player得list再触发事件，不然后面会先出发回调，会导致player.currentMusic获得不到
+                player.mMusicList = dataList
                 _musicItems.value = dataList
                 _dataLoading.value = false
-                isDataLoadingError.value = false
+                _isDataLoadingError.value = false
             }
 
             override fun onFailed(mes: String) {
-                isDataLoadingError.value = true
+                _isDataLoadingError.value = true
             }
         })
     }
 
     //加载专辑列表
-    private fun loadAlbumList() {
+    fun loadAlbumList() {
         _dataLoading.value = true
         dataRepository.getLocalAlbumList(object : LocalDataSource.Callback<Album>{
             override fun onLoaded(dataList: MutableList<Album>) {
                 _albumItems.value = dataList
                 _dataLoading.value = false
-                isDataLoadingError.value = false
+                _isDataLoadingError.value = false
             }
 
             override fun onFailed(mes: String) {
-                isDataLoadingError.value = true
+                _isDataLoadingError.value = true
             }
 
         })
     }
 
     //加载歌手列表
-    private fun loadArtistList() {
+    fun loadArtistList() {
         _dataLoading.value = true
         dataRepository.getLocalArtistList(object : LocalDataSource.Callback<Artist>{
             override fun onLoaded(dataList: MutableList<Artist>) {
                 _artistItems.value = dataList
                 _dataLoading.value = false
-                isDataLoadingError.value = false
+                _isDataLoadingError.value = false
             }
 
             override fun onFailed(mes: String) {
-                isDataLoadingError.value = true
+                _isDataLoadingError.value = true
             }
 
         })
@@ -150,9 +164,35 @@ class LocalMusicViewModel(private val dataRepository: DataRepository) : ViewMode
         player.pre()
     }
 
+    fun seekTo(mesc: Int) {
+        player.seekTo(mesc)
+    }
+
     //打开播放页面
     fun showOrHidePlayFragment() {
         _isShow.value = !_isShow.value!!
+    }
+
+    //修改播放循环模式
+    fun changeLoopMode() {
+        val playMode = PlayMode.valueOf(Preference.play_mode)
+        if (playMode == PlayMode.SHUFFLE) {
+            player.setMode(PlayMode.LOOP)
+        } else {
+            var m = playMode.value
+            m = (++m) % 3
+            player.setMode(PlayMode.valueOf(m))
+        }
+    }
+
+    //随机模式
+    fun changeShuffleMode() {
+        val playMode = PlayMode.valueOf(Preference.play_mode)
+        if (playMode != PlayMode.SHUFFLE) {
+            player.setMode(PlayMode.SHUFFLE)
+        } else {
+            player.setMode(PlayMode.SINGLE_LOOP)
+        }
     }
 
     /**

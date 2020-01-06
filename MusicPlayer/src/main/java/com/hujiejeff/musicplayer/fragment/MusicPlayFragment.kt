@@ -1,6 +1,6 @@
 package com.hujiejeff.musicplayer.fragment
 
-import android.os.Build
+import android.content.Context
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
@@ -8,61 +8,45 @@ import android.view.ViewGroup
 import android.widget.SeekBar
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.FragmentPagerAdapter
+import androidx.lifecycle.Observer
 import androidx.viewpager.widget.ViewPager
-import com.hujiejeff.musicplayer.OnPlayerEventListener
+import com.hujiejeff.musicplayer.MainActivity
 import com.hujiejeff.musicplayer.R
 import com.hujiejeff.musicplayer.base.BaseFragment
 import com.hujiejeff.musicplayer.data.entity.Music
 import com.hujiejeff.musicplayer.data.entity.PlayMode
 import com.hujiejeff.musicplayer.service.AudioPlayer
 import com.hujiejeff.musicplayer.data.Preference
+import com.hujiejeff.musicplayer.localmusic.LocalMusicViewModel
 import com.hujiejeff.musicplayer.util.*
 import kotlinx.android.synthetic.main.card_album.view.*
-import kotlinx.android.synthetic.main.fragment_music_play.*
 import kotlinx.android.synthetic.main.fragment_music_play.view.*
 
-class MusicPlayFragment : BaseFragment(), OnPlayerEventListener, SeekBar.OnSeekBarChangeListener {
+class MusicPlayFragment : BaseFragment(), SeekBar.OnSeekBarChangeListener {
 
-    private val music: Music?
-        get() = AudioPlayer.INSTANCE.currentMusic
-    private val player
-        get() = AudioPlayer.INSTANCE
     private val fragmentList = mutableListOf<Fragment>()
 
     private var isFirst = true
+
+    private lateinit var mainActivity: MainActivity
+    private lateinit var viewModel: LocalMusicViewModel
 
     override fun getLayoutId() = R.layout.fragment_music_play
 
     override fun initView(view: View) {
         view.apply {
-            music?.let {
+            viewModel.currentMusic.value?.let {
+                logD("updateUI")
                 updateUI(it)
+                seek_bar.progress = Preference.play_progress
             }
-            iv_play_mode_loop.setOnClickListener {
-                changeLoopMode()
-            }
-            iv_play_mode_shuffle.setOnClickListener {
-                changeShuffleMode()
-            }
-            iv_play_btn_next.setOnClickListener {
-                player.next()
-            }
-            cv_play_btn_play.setOnClickListener {
-                player.playOrPause()
-            }
-            iv_paly_btn_prev.setOnClickListener {
-                player.pre()
-            }
-            seek_bar.setOnSeekBarChangeListener(this@MusicPlayFragment)
-            seek_bar.setOnClickListener {
-                //屏蔽点击
-            }
-            iv_play_btn_close.setOnClickListener {
-                activity?.onBackPressed()
-            }
+            //attach前尚未订阅，所以无法接收消息改变UI
+            iv_play_btn_play?.isSelected = viewModel.isPlay.value!!
+
+            initClickListener()
             isClickable = true
             //viewpager
-            AudioPlayer.INSTANCE.mMusicList.forEach {
+            viewModel.musicItems.value?.forEach {
                 fragmentList.add(AlbumCardFragment(it.albumID))
             }
             play_view_pager.adapter = PlayAlbumPagerAdapter()
@@ -82,52 +66,91 @@ class MusicPlayFragment : BaseFragment(), OnPlayerEventListener, SeekBar.OnSeekB
                     //TODO 第一次
                     if (!isFirst) {
                         handler.postDelayed({
-                            player.play(position)
+                            viewModel.play(position)
                         }, 500)
 
                     }
                     isFirst = false
                 }
             })
-            play_view_pager.currentItem = AudioPlayer.INSTANCE.mMusicList.indexOf(music)
-        }
-        transparentStatusBar(true)
-    }
-
-    override fun onHiddenChanged(hidden: Boolean) {
-        super.onHiddenChanged(hidden)
-        transparentStatusBar(!hidden)
-    }
-
-    private fun transparentStatusBar(show: Boolean) {
-        checkAndroidVersionAction(Build.VERSION_CODES.M, {
-            activity?.window?.setTransparentStatusBar(show)
-        })
-    }
-
-    private fun changeShuffleMode() {
-        val playMode = PlayMode.valueOf(Preference.play_mode)
-        if (playMode != PlayMode.SHUFFLE) {
-            player.setMode(PlayMode.SHUFFLE)
-        } else {
-            player.setMode(PlayMode.SINGLE_LOOP)
+            play_view_pager.currentItem = viewModel.playPosition
         }
     }
 
-    private fun changeLoopMode() {
-        val playMode = PlayMode.valueOf(Preference.play_mode)
-        if (playMode == PlayMode.SHUFFLE) {
-            player.setMode(PlayMode.LOOP)
-        } else {
-            var m = playMode.value
-            m = (++m) % 3
-            player.setMode(PlayMode.valueOf(m))
+    override fun onAttach(context: Context) {
+        super.onAttach(context)
+        mainActivity = context as MainActivity
+        viewModel = mainActivity.obtainViewModel()
+        subscribe()
+    }
+
+    //初始按钮监听
+    private fun View.initClickListener() {
+        iv_play_mode_loop.setOnClickListener {
+            viewModel.changeLoopMode()
+        }
+
+        iv_play_mode_shuffle.setOnClickListener {
+            viewModel.changeShuffleMode()
+        }
+
+        iv_paly_btn_prev.setOnClickListener {
+            viewModel.pre()
+        }
+        iv_play_btn_next.setOnClickListener {
+            viewModel.next()
+        }
+        cv_play_btn_play.setOnClickListener {
+            viewModel.playOrPause()
+        }
+
+        seek_bar.setOnSeekBarChangeListener(this@MusicPlayFragment)
+        seek_bar.setOnClickListener {
+            //屏蔽点击
+        }
+
+        iv_play_btn_close.setOnClickListener {
+            activity?.onBackPressed()
         }
     }
 
-    override fun onActivityCreated(savedInstanceState: Bundle?) {
-        super.onActivityCreated(savedInstanceState)
-        player.addOnPlayerEventListener(this)
+    //订阅消息改变UI
+    private fun subscribe() {
+        viewModel.apply {
+            //music change
+            currentMusic.observe(mainActivity, Observer {
+                view?.updateUI(it)
+            })
+
+            //music state
+            isPlay.observe(mainActivity, Observer {
+                view?.iv_play_btn_play?.isSelected = it
+            })
+
+            //music progress
+            playProgress.observe(mainActivity, Observer {
+                view?.seek_bar?.progress = it
+                view?.tv_current_time?.text = getMusicTimeFormatString(it)
+            })
+
+            //music mode
+            playMode.observe(mainActivity, Observer {
+                when (it) {
+                    PlayMode.SINGLE, PlayMode.LOOP, PlayMode.SINGLE_LOOP -> {
+                        view?.iv_play_mode_loop?.setImageLevel(it.value)
+                        view?.iv_play_mode_shuffle?.isSelected = false
+                    }
+                    PlayMode.SHUFFLE -> {
+                        view?.iv_play_mode_loop?.setImageLevel(0)
+                        view?.iv_play_mode_shuffle?.isSelected = true
+                    }
+                    else -> {
+                    }
+                }
+            })
+        }
+
+
     }
 
     private fun View.updateUI(music: Music) {
@@ -135,7 +158,7 @@ class MusicPlayFragment : BaseFragment(), OnPlayerEventListener, SeekBar.OnSeekB
             tv_play_title.text = title
             tv_play_artist.text = artist
             seek_bar.max = duration.toInt()
-            seek_bar.progress = Preference.play_progress
+            seek_bar.progress = 0
             tv_current_time.text = getMusicTimeFormatString(Preference.play_progress)
             tv_max_time.text = getMusicTimeFormatString(duration.toInt())
             play_view_pager.setCurrentItem(AudioPlayer.INSTANCE.mMusicList.indexOf(music), true)
@@ -157,10 +180,10 @@ class MusicPlayFragment : BaseFragment(), OnPlayerEventListener, SeekBar.OnSeekB
         }
     }
 
-    inner class PlayAlbumPagerAdapter : FragmentPagerAdapter(childFragmentManager) {
+    inner class PlayAlbumPagerAdapter :
+        FragmentPagerAdapter(childFragmentManager, BEHAVIOR_RESUME_ONLY_CURRENT_FRAGMENT) {
         override fun getItem(position: Int) = fragmentList[position]
         override fun getCount() = fragmentList.size
-
     }
 
 
@@ -172,39 +195,6 @@ class MusicPlayFragment : BaseFragment(), OnPlayerEventListener, SeekBar.OnSeekB
     }
 
     override fun onStopTrackingTouch(seekBar: SeekBar?) {
-        player.seekTo(seekBar!!.progress)
-    }
-
-    override fun onChange(music: Music) {
-        view?.updateUI(music)
-    }
-
-    override fun onPlayerStart() {
-        view?.iv_play_btn_play?.isSelected = true
-    }
-
-    override fun onPlayerPause() {
-        view?.iv_play_btn_play?.isSelected = false
-    }
-
-    override fun onPublish(progress: Int) {
-        view?.seek_bar?.progress = progress
-        view?.tv_current_time?.text = getMusicTimeFormatString(progress)
-    }
-
-    override fun onBufferingUpdate(percent: Int) {
-    }
-
-    override fun onModeChange(value: Int) {
-        when (PlayMode.valueOf(value)) {
-            PlayMode.SINGLE, PlayMode.LOOP, PlayMode.SINGLE_LOOP -> {
-                iv_play_mode_loop.setImageLevel(value)
-                iv_play_mode_shuffle.isSelected = false
-            }
-            PlayMode.SHUFFLE -> {
-                iv_play_mode_loop.setImageLevel(0)
-                iv_play_mode_shuffle.isSelected = true
-            }
-        }
+        viewModel.seekTo(seekBar!!.progress)
     }
 }

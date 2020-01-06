@@ -13,7 +13,6 @@ import com.hujiejeff.musicplayer.component.Notifier
 import com.hujiejeff.musicplayer.data.entity.Music
 import com.hujiejeff.musicplayer.data.entity.PlayMode
 import com.hujiejeff.musicplayer.data.Preference
-import com.hujiejeff.musicplayer.util.getMusicList
 import com.hujiejeff.musicplayer.util.logD
 import kotlin.random.Random
 
@@ -42,18 +41,23 @@ class AudioPlayer private constructor() {
         get() = state == STATUS_PLAYING
     private val isIdle: Boolean
         get() = state == STATUS_IDLE
-    private var position
+    private var _position
         set(value) {
             Preference.play_position = value
         }
         get() = Preference.play_position
+    val playPosition get() = _position
+
     val currentMusic: Music?
         get() {
-            if (mMusicList.size == 0) return null
-            if (position !in 0 until mMusicList.size) {
-                position = 0
+            if (mMusicList.size == 0) {
+                logD("size is 0")
+                return null
             }
-            return mMusicList[position]
+            if (_position !in 0 until mMusicList.size) {
+                _position = 0
+            }
+            return mMusicList[_position]
         }
     private val audioPosition: Int
         get() = if (isPause || isPlaying) mMediaPlayer.currentPosition else 0
@@ -145,7 +149,7 @@ class AudioPlayer private constructor() {
                 }
             }
         }
-        Preference.play_position = position
+        _position = position
         //通知
         Notifier.getInstance().showPlay(music)
     }
@@ -159,7 +163,7 @@ class AudioPlayer private constructor() {
             isPlaying -> pausePlayerWithReleaseAudioFocus()
             isPause -> startPlayerWithRequestAudioFocus()
             else -> {
-                play(position)
+                play(_position)
                 isResume = true
             }
         }
@@ -269,12 +273,12 @@ class AudioPlayer private constructor() {
         when (PlayMode.valueOf(Preference.play_mode)) {
             PlayMode.SHUFFLE -> play(Random(1).nextInt(mMusicList.size))
             PlayMode.SINGLE -> stopPlayerWithReleaseAudioFocus()
-            PlayMode.SINGLE_LOOP -> play(position)
+            PlayMode.SINGLE_LOOP -> play(_position)
             PlayMode.LOOP -> {
                 if (next) {
-                    play(position - 1)
+                    play(_position - 1)
                 } else {
-                    play(position + 1)
+                    play(_position + 1)
                 }
             }
         }
@@ -287,7 +291,7 @@ class AudioPlayer private constructor() {
     fun seekTo(msec: Int) {
         if (isPlaying || isPause || isIdle) {
             if (isIdle) {
-                play(position)
+                play(_position)
             }
             mMediaPlayer.seekTo(msec)
             triggerListener {
@@ -349,7 +353,7 @@ class AudioPlayer private constructor() {
             audioManager.abandonAudioFocusRequest(focusRequest!!)
         } else {
             audioManager.abandonAudioFocus {
-                logD("test")
+                logD("abandonAudioFocusRequest")
             }
         }
     }

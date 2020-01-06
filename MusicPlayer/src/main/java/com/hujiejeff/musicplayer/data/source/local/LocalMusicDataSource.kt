@@ -15,6 +15,7 @@ import com.hujiejeff.musicplayer.util.getMusicList
 class LocalMusicDataSource(val appExecutors: AppExecutors): LocalDataSource {
     override fun getLocalMusicList(callback: LocalDataSource.Callback<Music>) {
         appExecutors.diskIO.execute {
+            Thread.sleep(3000) //模拟耗时操作
             val list = getMusicList()
             appExecutors.mainThread.execute {
                 if (list.isEmpty()) {
