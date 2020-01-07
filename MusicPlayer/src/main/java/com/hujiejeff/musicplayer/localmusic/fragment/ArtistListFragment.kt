@@ -9,7 +9,7 @@ import androidx.lifecycle.Observer
 import androidx.recyclerview.widget.GridLayoutManager
 import com.hujiejeff.musicplayer.localmusic.LocalMusicActivity
 import com.hujiejeff.musicplayer.R
-import com.hujiejeff.musicplayer.base.BaseFragment
+import com.hujiejeff.musicplayer.base.AbstractLazyLoadFragment
 import com.hujiejeff.musicplayer.base.BaseRecyclerViewAdapter
 import com.hujiejeff.musicplayer.base.BaseViewHolder
 import com.hujiejeff.musicplayer.data.entity.Artist
@@ -18,7 +18,8 @@ import com.hujiejeff.musicplayer.util.getArtistCover
 import kotlinx.android.synthetic.main.fragment_list.view.*
 import kotlinx.android.synthetic.main.item_artist_list.view.*
 
-class ArtistListFragment : BaseFragment() {
+class ArtistListFragment : AbstractLazyLoadFragment() {
+
     private val artistList: MutableList<Artist> = mutableListOf()
     private val spanCount = 2
     private lateinit var localMusicActivity: LocalMusicActivity
@@ -45,37 +46,42 @@ class ArtistListFragment : BaseFragment() {
     }
 
     private fun subscribe() {
-        viewModel.artistItems.observe(localMusicActivity, Observer {
-            artistList.addAll(it)
-            view?.rv_list?.adapter?.notifyDataSetChanged()
-        })
-    }
+        viewModel.apply {
 
-    override fun onActivityCreated(savedInstanceState: Bundle?) {
-        super.onActivityCreated(savedInstanceState)
-        if (artistList.isEmpty()) {
-            loadAlbumList()
+            artistItems.observe(localMusicActivity, Observer {
+                artistList.addAll(it)
+                view?.rv_list?.adapter?.notifyDataSetChanged()
+            })
+
+
+            artistDataLoading.observe(localMusicActivity, Observer { isLoading ->
+                view?.rv_list?.visibility = if (isLoading) View.INVISIBLE else View.VISIBLE
+                if (isLoading) {
+                    view?.progressBar?.show()
+                } else {
+                    view?.progressBar?.hide()
+                }
+            })
         }
     }
 
-    private fun loadAlbumList() {
-        PermissionReq
-            .with(this)
-            .permissions(
-                Manifest.permission.READ_EXTERNAL_STORAGE,
-                Manifest.permission.WRITE_EXTERNAL_STORAGE
-            )
-            .result(object : PermissionReq.Result {
-                override fun onGranted() {
-                    viewModel.loadArtistList()
-                }
+    override fun getTAG(): String = ArtistListFragment::class.java.simpleName
 
-                override fun onDenied() {
-                    Toast.makeText(context, "permission deny", Toast.LENGTH_SHORT).show()
-                }
-            })
-            .request()
+    override fun onLoadData() {
+        if (artistList.isEmpty()) {
+            viewModel.loadArtistList()
+        }
     }
+
+    override fun onPermissionFailed() {
+        Toast.makeText(context, "permission deny", Toast.LENGTH_SHORT).show()
+    }
+
+    override fun getPermissions(): Array<String> = arrayOf(
+        Manifest.permission.READ_EXTERNAL_STORAGE,
+        Manifest.permission.WRITE_EXTERNAL_STORAGE
+    )
+
 
     inner class ArtistRecycleViewAdapter :
         BaseRecyclerViewAdapter<Artist>(context, R.layout.item_artist_list, artistList) {

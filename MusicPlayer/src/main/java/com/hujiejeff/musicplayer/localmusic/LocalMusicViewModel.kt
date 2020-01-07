@@ -22,9 +22,19 @@ class LocalMusicViewModel : ViewModel(),
     private val player: AudioPlayer = AudioPlayer.INSTANCE
 
     //数据加载
-    private val _dataLoading = MutableLiveData<Boolean>()
-    val dataLoading: LiveData<Boolean>
-        get() = _dataLoading
+    private val _musicDataLoading = MutableLiveData<Boolean>()
+    val musicDataLoading: LiveData<Boolean>
+        get() = _musicDataLoading
+
+    private val _albumDataLoading = MutableLiveData<Boolean>()
+    val albumDataLoading: LiveData<Boolean>
+        get() = _albumDataLoading
+
+    private val _artistDataLoading = MutableLiveData<Boolean>()
+    val artistDataLoading: LiveData<Boolean>
+        get() = _artistDataLoading
+
+
     //错误提示
     private val _isDataLoadingError = MutableLiveData<Boolean>()
     val isDataLoadingError: LiveData<Boolean>
@@ -84,13 +94,13 @@ class LocalMusicViewModel : ViewModel(),
 
     //加载音乐列表
     fun loadMusicList() {
-        _dataLoading.value = true
+        _musicDataLoading.value = true
         dataRepository.getLocalMusicList(object : LocalDataSource.Callback<Music> {
             override fun onLoaded(dataList: MutableList<Music>) {
                 //因为是立即回调，所以要先设置player得list再触发事件，不然后面会先出发回调，会导致player.currentMusic获得不到
                 player.mMusicList = dataList
                 _musicItems.value = dataList
-                _dataLoading.value = false
+                _musicDataLoading.value = false
                 _isDataLoadingError.value = false
             }
 
@@ -102,11 +112,11 @@ class LocalMusicViewModel : ViewModel(),
 
     //加载专辑列表
     fun loadAlbumList() {
-        _dataLoading.value = true
+        _albumDataLoading.value = true
         dataRepository.getLocalAlbumList(object : LocalDataSource.Callback<Album>{
             override fun onLoaded(dataList: MutableList<Album>) {
                 _albumItems.value = dataList
-                _dataLoading.value = false
+                _albumDataLoading.value = false
                 _isDataLoadingError.value = false
             }
 
@@ -119,11 +129,11 @@ class LocalMusicViewModel : ViewModel(),
 
     //加载歌手列表
     fun loadArtistList() {
-        _dataLoading.value = true
+        _artistDataLoading.value = true
         dataRepository.getLocalArtistList(object : LocalDataSource.Callback<Artist>{
             override fun onLoaded(dataList: MutableList<Artist>) {
                 _artistItems.value = dataList
-                _dataLoading.value = false
+                _artistDataLoading.value = false
                 _isDataLoadingError.value = false
             }
 

@@ -23,7 +23,7 @@ import com.hujiejeff.musicplayer.util.logD
 import kotlinx.android.synthetic.main.fragment_list.view.*
 import kotlinx.android.synthetic.main.item_music_list.view.*
 
-class MusicListFragment : BaseFragment() {
+class MusicListFragment : AbstractLazyLoadFragment() {
 
     private val musicList: MutableList<Music> = mutableListOf()
     private lateinit var localMusicActivity: LocalMusicActivity
@@ -66,7 +66,7 @@ class MusicListFragment : BaseFragment() {
                 ).show()
             })
 
-            dataLoading.observe(localMusicActivity, Observer { isLoading ->
+            musicDataLoading.observe(localMusicActivity, Observer { isLoading ->
                 view?.rv_list?.visibility = if (isLoading) View.INVISIBLE else View.VISIBLE
                 if (isLoading) {
                     view?.progressBar?.show()
@@ -77,31 +77,22 @@ class MusicListFragment : BaseFragment() {
         }
     }
 
-    override fun onActivityCreated(savedInstanceState: Bundle?) {
-        super.onActivityCreated(savedInstanceState)
-        if (musicList.isEmpty()) {
-            loadMusicList()
-        }
+    override fun getTAG(): String = MusicListFragment::class.java.simpleName
+
+    override fun onLoadData() {
+        if (musicList.isEmpty())
+            viewModel.loadMusicList()
     }
 
-    private fun loadMusicList() {
-        PermissionReq
-            .with(this)
-            .permissions(
-                Manifest.permission.READ_EXTERNAL_STORAGE,
-                Manifest.permission.WRITE_EXTERNAL_STORAGE
-            )
-            .result(object : PermissionReq.Result {
-                override fun onGranted() {
-                    viewModel.loadMusicList()
-                }
-
-                override fun onDenied() {
-                    Toast.makeText(context, "permission deny", Toast.LENGTH_SHORT).show()
-                }
-            })
-            .request()
+    override fun onPermissionFailed() {
+        Toast.makeText(context, "permission deny", Toast.LENGTH_SHORT).show()
     }
+
+    override fun getPermissions(): Array<String> = arrayOf(
+        Manifest.permission.READ_EXTERNAL_STORAGE,
+        Manifest.permission.WRITE_EXTERNAL_STORAGE
+    )
+
 
     inner class MusicRecyclerViewAdapter :
         BaseRecyclerViewAdapter<Music>(context, R.layout.item_music_list, musicList) {

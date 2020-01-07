@@ -29,6 +29,7 @@ class LocalMusicDataSource(val appExecutors: AppExecutors): LocalDataSource {
 
     override fun getLocalAlbumList(callback: LocalDataSource.Callback<Album>) {
         appExecutors.diskIO.execute {
+            Thread.sleep(3000) //模拟耗时操作
             val list = getAlbumList()
             appExecutors.mainThread.execute {
                 if (list.isEmpty()) {
@@ -42,6 +43,7 @@ class LocalMusicDataSource(val appExecutors: AppExecutors): LocalDataSource {
 
     override fun getLocalArtistList(callback: LocalDataSource.Callback<Artist>) {
         appExecutors.diskIO.execute {
+            Thread.sleep(3000) //模拟耗时操作
             val list = getArtistList()
             appExecutors.mainThread.execute {
                 if (list.isEmpty()) {

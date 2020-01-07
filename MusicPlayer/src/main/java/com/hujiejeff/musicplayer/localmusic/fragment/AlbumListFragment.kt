@@ -1,16 +1,15 @@
 package com.hujiejeff.musicplayer.localmusic.fragment
 
-import PermissionReq
 import android.Manifest
 import android.content.Context
-import android.os.Bundle
 import android.view.View
 import android.widget.Toast
 import androidx.lifecycle.Observer
+import androidx.recyclerview.widget.DefaultItemAnimator
 import androidx.recyclerview.widget.GridLayoutManager
 import com.hujiejeff.musicplayer.localmusic.LocalMusicActivity
 import com.hujiejeff.musicplayer.R
-import com.hujiejeff.musicplayer.base.BaseFragment
+import com.hujiejeff.musicplayer.base.AbstractLazyLoadFragment
 import com.hujiejeff.musicplayer.base.BaseRecyclerViewAdapter
 import com.hujiejeff.musicplayer.base.BaseViewHolder
 import com.hujiejeff.musicplayer.data.entity.Album
@@ -19,7 +18,8 @@ import com.hujiejeff.musicplayer.util.loadCover
 import kotlinx.android.synthetic.main.fragment_list.view.*
 import kotlinx.android.synthetic.main.item_album_list.view.*
 
-class AlbumListFragment: BaseFragment() {
+class AlbumListFragment : AbstractLazyLoadFragment() {
+
     private val albumList: MutableList<Album> = mutableListOf()
     private val spanCount = 2
     private lateinit var localMusicActivity: LocalMusicActivity
@@ -34,6 +34,7 @@ class AlbumListFragment: BaseFragment() {
                 }
             }
             layoutManager = GridLayoutManager(context, spanCount)
+            itemAnimator = DefaultItemAnimator()
         }
     }
 
@@ -45,38 +46,43 @@ class AlbumListFragment: BaseFragment() {
     }
 
     private fun subscribe() {
-        viewModel.albumItems.observe(localMusicActivity, Observer {
-            albumList.addAll(it)
-            view?.rv_list?.adapter?.notifyDataSetChanged()
-        })
-    }
+        viewModel.apply {
+            albumItems.observe(localMusicActivity, Observer {
+                albumList.addAll(it)
+                view?.rv_list?.adapter?.notifyDataSetChanged()
 
-    override fun onActivityCreated(savedInstanceState: Bundle?) {
-        super.onActivityCreated(savedInstanceState)
-        if (albumList.isEmpty()) {
-            loadAlbumList()
+            })
+
+            albumDataLoading.observe(localMusicActivity, Observer { isLoading ->
+                view?.rv_list?.visibility = if (isLoading) View.INVISIBLE else View.VISIBLE
+                if (isLoading) {
+                    view?.progressBar?.show()
+                } else {
+                    view?.progressBar?.hide()
+                }
+            })
         }
     }
 
-    private fun loadAlbumList() {
-        PermissionReq
-            .with(this)
-            .permissions(
-                Manifest.permission.READ_EXTERNAL_STORAGE,
-                Manifest.permission.WRITE_EXTERNAL_STORAGE
-            )
-            .result(object : PermissionReq.Result {
-                override fun onGranted() {
-                    viewModel.loadAlbumList()
-                }
-                override fun onDenied() {
-                    Toast.makeText(context, "permission deny", Toast.LENGTH_SHORT).show()
-                }
-            })
-            .request()
+    override fun getTAG(): String = AlbumListFragment::class.java.simpleName
+
+    override fun onLoadData() {
+        if (albumList.isEmpty()) {
+            viewModel.loadAlbumList()
+        }
     }
 
-    inner class AlbumRecycleViewAdapter: BaseRecyclerViewAdapter<Album>(context, R.layout.item_album_list, albumList) {
+    override fun onPermissionFailed() {
+        Toast.makeText(context, "permission deny", Toast.LENGTH_SHORT).show()
+    }
+
+    override fun getPermissions(): Array<String> = arrayOf(
+        Manifest.permission.READ_EXTERNAL_STORAGE,
+        Manifest.permission.WRITE_EXTERNAL_STORAGE
+    )
+
+    inner class AlbumRecycleViewAdapter :
+        BaseRecyclerViewAdapter<Album>(context, R.layout.item_album_list, albumList) {
         override fun convert(holder: BaseViewHolder, data: Album) {
             holder.itemView.apply {
                 album_title.text = data.title
