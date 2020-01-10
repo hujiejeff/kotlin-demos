@@ -2,6 +2,7 @@ package com.hujiejeff.musicplayer.base
 
 import android.app.Application
 import android.content.Context
+import com.hujiejeff.musicplayer.Injection
 import com.hujiejeff.musicplayer.service.AudioPlayer
 import com.hujiejeff.musicplayer.data.Preference
 import com.hujiejeff.musicplayer.data.source.DataRepository
@@ -23,7 +24,7 @@ class App : Application() {
         //TODO 不能在这里请求contentprovider，要权限
         AudioPlayer.INSTANCE.init(appContext)
         Preference.init(this)
-        dateRepository = DataRepository(LocalMusicDataSource(AppExecutors()))
+        dateRepository = Injection.provideDataRepository(appContext)
     }
 
     fun todo() {

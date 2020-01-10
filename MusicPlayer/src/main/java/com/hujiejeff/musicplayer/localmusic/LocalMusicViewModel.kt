@@ -7,7 +7,7 @@ import com.hujiejeff.musicplayer.service.OnPlayerEventListener
 import com.hujiejeff.musicplayer.base.App
 import com.hujiejeff.musicplayer.data.Preference
 import com.hujiejeff.musicplayer.data.entity.*
-import com.hujiejeff.musicplayer.data.source.LocalDataSource
+import com.hujiejeff.musicplayer.data.source.Callback
 import com.hujiejeff.musicplayer.service.AudioPlayer
 import com.hujiejeff.musicplayer.util.logD
 
@@ -95,10 +95,10 @@ class LocalMusicViewModel : ViewModel(),
     //加载音乐列表
     fun loadMusicList() {
         _musicDataLoading.value = true
-        dataRepository.getLocalMusicList(object : LocalDataSource.Callback<Music> {
-            override fun onLoaded(dataList: MutableList<Music>) {
+        dataRepository.getLocalMusicList(object : Callback<List<Music>> {
+            override fun onLoaded(dataList: List<Music>) {
                 //因为是立即回调，所以要先设置player得list再触发事件，不然后面会先出发回调，会导致player.currentMusic获得不到
-                player.mMusicList = dataList
+                player.mMusicList.addAll(dataList)
                 _musicItems.value = dataList
                 _musicDataLoading.value = false
                 _isDataLoadingError.value = false
@@ -113,8 +113,8 @@ class LocalMusicViewModel : ViewModel(),
     //加载专辑列表
     fun loadAlbumList() {
         _albumDataLoading.value = true
-        dataRepository.getLocalAlbumList(object : LocalDataSource.Callback<Album>{
-            override fun onLoaded(dataList: MutableList<Album>) {
+        dataRepository.getLocalAlbumList(object : Callback<List<Album>>{
+            override fun onLoaded(dataList: List<Album>) {
                 _albumItems.value = dataList
                 _albumDataLoading.value = false
                 _isDataLoadingError.value = false
@@ -130,8 +130,8 @@ class LocalMusicViewModel : ViewModel(),
     //加载歌手列表
     fun loadArtistList() {
         _artistDataLoading.value = true
-        dataRepository.getLocalArtistList(object : LocalDataSource.Callback<Artist>{
-            override fun onLoaded(dataList: MutableList<Artist>) {
+        dataRepository.getLocalArtistList(object : Callback<List<Artist>>{
+            override fun onLoaded(dataList: List<Artist>) {
                 _artistItems.value = dataList
                 _artistDataLoading.value = false
                 _isDataLoadingError.value = false

@@ -4,6 +4,25 @@ package com.hujiejeff.musicplayer.data.entity
 /**
  * Create by hujie on 2020/1/8
  */
+
+
+data class PlayListCatlistResponse(
+    val all: SubCat,
+    val sub: List<SubCat>,
+    val categories: Map<Int, String>,
+    val code: Int
+)
+
+//小分类
+data class SubCat(
+    val name: String,
+    val type: Int,
+    val category: Int, //大分类
+    val hot: Boolean
+)
+
+
+
 //歌单列表响应
 data class PlayListsResponse(
     val code: Int,

@@ -3,6 +3,7 @@ package com.hujiejeff.musicplayer.data.source.local
 import com.hujiejeff.musicplayer.data.entity.Album
 import com.hujiejeff.musicplayer.data.entity.Artist
 import com.hujiejeff.musicplayer.data.entity.Music
+import com.hujiejeff.musicplayer.data.source.Callback
 import com.hujiejeff.musicplayer.data.source.LocalDataSource
 import com.hujiejeff.musicplayer.execute.AppExecutors
 import com.hujiejeff.musicplayer.util.getAlbumList
@@ -13,7 +14,7 @@ import com.hujiejeff.musicplayer.util.getMusicList
  * Create by hujie on 2020/1/3
  */
 class LocalMusicDataSource(val appExecutors: AppExecutors): LocalDataSource {
-    override fun getLocalMusicList(callback: LocalDataSource.Callback<Music>) {
+    override fun getLocalMusicList(callback: Callback<List<Music>>) {
         appExecutors.diskIO.execute {
             Thread.sleep(3000) //模拟耗时操作
             val list = getMusicList()
@@ -27,7 +28,7 @@ class LocalMusicDataSource(val appExecutors: AppExecutors): LocalDataSource {
         }
     }
 
-    override fun getLocalAlbumList(callback: LocalDataSource.Callback<Album>) {
+    override fun getLocalAlbumList(callback: Callback<List<Album>>) {
         appExecutors.diskIO.execute {
             Thread.sleep(3000) //模拟耗时操作
             val list = getAlbumList()
@@ -41,7 +42,7 @@ class LocalMusicDataSource(val appExecutors: AppExecutors): LocalDataSource {
         }
     }
 
-    override fun getLocalArtistList(callback: LocalDataSource.Callback<Artist>) {
+    override fun getLocalArtistList(callback: Callback<List<Artist>>) {
         appExecutors.diskIO.execute {
             Thread.sleep(3000) //模拟耗时操作
             val list = getArtistList()
@@ -53,7 +54,6 @@ class LocalMusicDataSource(val appExecutors: AppExecutors): LocalDataSource {
                 }
             }
         }
-
     }
 
 }

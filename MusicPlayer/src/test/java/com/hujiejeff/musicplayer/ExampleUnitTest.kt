@@ -21,6 +21,12 @@ class ExampleUnitTest {
     }
 
     @Test
+    fun testGetPlayListCatList() {
+        val response = getRetrofitApis().getPlayListCatList().execute()
+        println(response.body().toString())
+    }
+
+    @Test
     fun testNormalPlayLists() {
         val response = getRetrofitApis().getNormalPlayLists().execute()
         println(response.body().toString())

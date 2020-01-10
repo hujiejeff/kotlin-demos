@@ -1,5 +1,6 @@
 package com.hujiejeff.musicplayer.data.source.remote
 
+import com.hujiejeff.musicplayer.data.entity.PlayListCatlistResponse
 import com.hujiejeff.musicplayer.data.entity.PlayListDetailResponse
 import com.hujiejeff.musicplayer.data.entity.PlayListsResponse
 import retrofit2.Call
@@ -19,10 +20,10 @@ interface Apis {
      * */
 
     /**
-     * 获取歌单分类
+     * 获取歌单分类 test ok
      * */
     @GET("playlist/catlist")
-    fun getPlayListCatList()
+    fun getPlayListCatList(): Call<PlayListCatlistResponse>
 
     /**
      * 获取热门歌单分类
