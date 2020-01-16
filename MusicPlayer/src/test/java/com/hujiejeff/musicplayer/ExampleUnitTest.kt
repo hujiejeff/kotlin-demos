@@ -1,5 +1,6 @@
 package com.hujiejeff.musicplayer
 
+import android.app.Activity
 import com.hujiejeff.musicplayer.data.source.remote.Apis
 import okhttp3.*
 import org.junit.Test
@@ -78,5 +79,10 @@ class ExampleUnitTest {
             e.printStackTrace()
         }
 
+    }
+
+    @Test
+    fun testClass() {
+        println(Activity::class.java.canonicalName)
     }
 }

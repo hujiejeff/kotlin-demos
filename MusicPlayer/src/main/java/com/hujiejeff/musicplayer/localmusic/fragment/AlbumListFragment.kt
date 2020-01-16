@@ -56,9 +56,9 @@ class AlbumListFragment : AbstractLazyLoadFragment() {
             albumDataLoading.observe(localMusicActivity, Observer { isLoading ->
                 view?.rv_list?.visibility = if (isLoading) View.INVISIBLE else View.VISIBLE
                 if (isLoading) {
-                    view?.progressBar?.show()
+                    view?.loading_view?.show()
                 } else {
-                    view?.progressBar?.hide()
+                    view?.loading_view?.hide()
                 }
             })
         }
