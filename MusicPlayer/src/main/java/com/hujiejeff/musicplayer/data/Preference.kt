@@ -8,6 +8,7 @@ object Preference {
     private const val PLAY_MODE = "play_mode"
     private const val PLAY_POSITION = "play_position"
     private const val PLAY_PROGRESS = "play_progress"
+    private const val COOKIES = "cookies"
     private lateinit var sharedPreferences: SharedPreferences
     fun init(context: Context) {
         sharedPreferences = PreferenceManager.getDefaultSharedPreferences(context)
@@ -32,6 +33,10 @@ object Preference {
         )
         get() = getInt(PLAY_PROGRESS)
 
+    var cookies: Set<String>
+        set(value) = setStringSet(COOKIES, value)
+        get() = getStringSet(COOKIES, setOf())
+
     private fun setString(key: String, value: String) {
         sharedPreferences.edit().putString(key, value).apply()
     }
@@ -50,4 +55,10 @@ object Preference {
     }
 
     private fun getLong(key: String, defValue: Long = 0) = sharedPreferences.getLong(key, defValue)
+
+    private fun setStringSet(key: String, value: Set<String>) {
+        sharedPreferences.edit().putStringSet(key, value).apply()
+    }
+    private fun getStringSet(key: String, defValue: Set<String>): Set<String>  =
+        sharedPreferences.getStringSet(key, defValue)!!
 }

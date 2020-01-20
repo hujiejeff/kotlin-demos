@@ -4,7 +4,7 @@ import android.content.BroadcastReceiver
 import android.content.Context
 import android.content.Intent
 import android.text.TextUtils
-import com.hujiejeff.musicplayer.service.AudioPlayer
+import com.hujiejeff.musicplayer.player.AudioPlayer
 
 /**
  * 通知栏广播接收器

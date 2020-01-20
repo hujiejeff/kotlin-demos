@@ -11,7 +11,7 @@ import retrofit2.http.Query
  * Create by hujie on 2020/1/8
  */
 
-public const val baseUrl = "http://localhost:3000"
+public const val baseUrl = "http://192.168.137.1:3000"
 
 interface Apis {
 

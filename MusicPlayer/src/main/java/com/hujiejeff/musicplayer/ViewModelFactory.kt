@@ -4,14 +4,14 @@ import android.app.Application
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import com.hujiejeff.musicplayer.data.source.DataRepository
-import com.hujiejeff.musicplayer.localmusic.LocalMusicViewModel
+import com.hujiejeff.musicplayer.player.PlayerViewModel
 
 class ViewModelFactory private constructor(private val dataRepository: DataRepository) :
     ViewModelProvider.NewInstanceFactory() {
     override fun <T : ViewModel?> create(modelClass: Class<T>) =
         with(modelClass) {
             when {
-                isAssignableFrom(LocalMusicViewModel::class.java) -> LocalMusicViewModel(
+                isAssignableFrom(PlayerViewModel::class.java) -> PlayerViewModel(
 
                 )
                 else -> throw IllegalArgumentException("Unknown ViewModel class: ${modelClass.name}")

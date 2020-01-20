@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android">
+    <item
+        android:id="@+id/menu_bottom_item_discover"
+        android:icon="@drawable/ic_menu_discover"
+        android:title="@string/discover" />
+    <item
+        android:id="@+id/menu_bottom_item_my"
+        android:icon="@drawable/ic_menu_mymusic"
+        android:title="@string/my" />
+    <item
+        android:id="@+id/menu_bottom_item_video"
+        android:icon="@drawable/ic_menu_video"
+        android:title="@string/video" />
+</menu>

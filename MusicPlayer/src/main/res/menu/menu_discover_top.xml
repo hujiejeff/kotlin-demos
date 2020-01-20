@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android">
+    <item
+        android:id="@+id/menu_discover_top_item_everyday"
+        android:icon="@drawable/ic_date"
+        android:title="@string/discover_everyday" />
+    <item
+        android:id="@+id/menu_discover_top_item_playlist"
+        android:icon="@drawable/ic_discover_playlist"
+        android:title="@string/discover_playlist" />
+    <item
+        android:id="@+id/menu_discover_top_item_rank_list"
+        android:icon="@drawable/ic_discover_rank_list"
+        android:title="@string/discover_rank_list" />
+    <item
+        android:id="@+id/menu_discover_top_item_radio"
+        android:icon="@drawable/ic_discover_radio"
+        android:title="@string/discover_radio" />
+    <item
+        android:id="@+id/menu_discover_top_item_fm"
+        android:icon="@drawable/ic_discover_fm"
+        android:title="@string/discover_fm" />
+</menu>

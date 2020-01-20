@@ -24,4 +24,14 @@
     <string name="play_online_movie">网络串流</string>
     <string name="check">查看</string>
     <string name="again_back_press">再次按返回退出</string>
+    <string name="default_playlist_name">纯音乐</string>
+    <string name="default_playlist_count">300万</string>
+    <string name="my">本地音乐</string>
+    <string name="discover">发现</string>
+    <string name="video">视频</string>
+    <string name="discover_everyday">每日推荐</string>
+    <string name="discover_playlist">歌单</string>
+    <string name="discover_rank_list">排行榜</string>
+    <string name="discover_radio">电台</string>
+    <string name="discover_fm">私人FM</string>
 </resources>

@@ -86,7 +86,7 @@ class DataRepository(
 
         netMusicDataSource.loadPlayListCatList(object : Callback<PlayListCatlistResponse> {
             override fun onLoaded(t: PlayListCatlistResponse) {
-                val parentCat = t.categories.values  as List<String>
+                val parentCat = t.categories.values.toList()
                 val subCats = t.sub
                 cacheParentCat.addAll(parentCat)
                 cacheSubCats.addAll(subCats)
@@ -107,7 +107,7 @@ class DataRepository(
 
         netMusicDataSource.loadPlayListCatList(object : Callback<PlayListCatlistResponse> {
             override fun onLoaded(t: PlayListCatlistResponse) {
-                val parentCat = t.categories.values  as List<String>
+                val parentCat = t.categories.values.toList()
                 val subCats = t.sub
                 cacheParentCat.addAll(parentCat)
                 cacheSubCats.addAll(subCats)

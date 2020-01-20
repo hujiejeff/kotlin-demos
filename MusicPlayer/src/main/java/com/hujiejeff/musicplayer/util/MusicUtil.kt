@@ -106,6 +106,14 @@ fun ImageView.loadCover(albumID: Long) {
         .into(this)
 }
 
+fun ImageView.loadPlayListCover(url: String) {
+    Glide.with(context)
+        .load(url)
+        .placeholder(R.drawable.default_cover)
+        .error(R.drawable.default_cover)
+        .into(this)
+}
+
 fun getCover(albumID: Long): Bitmap {
     val artUri = Uri.parse("content://media/external/audio/albumart")
     val uri = ContentUris.withAppendedId(artUri, albumID)
@@ -128,3 +136,8 @@ fun getArtistCover(): Bitmap =
 fun queryAll(uri: Uri, projection: Array<String>): Cursor? = App.appContext.contentResolver.query(
     uri, projection, null, null, null
 )
+
+
+fun getBitmap() {
+
+}

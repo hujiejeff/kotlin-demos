@@ -2,29 +2,42 @@ package com.hujiejeff.musicplayer.base
 
 import android.app.Application
 import android.content.Context
+import androidx.lifecycle.*
 import com.hujiejeff.musicplayer.Injection
-import com.hujiejeff.musicplayer.service.AudioPlayer
+import com.hujiejeff.musicplayer.player.AudioPlayer
 import com.hujiejeff.musicplayer.data.Preference
 import com.hujiejeff.musicplayer.data.source.DataRepository
-import com.hujiejeff.musicplayer.data.source.local.LocalMusicDataSource
-import com.hujiejeff.musicplayer.execute.AppExecutors
+import com.hujiejeff.musicplayer.player.PlayerViewModel
 import com.hujiejeff.musicplayer.util.logD
 
-class App : Application() {
+class App : Application(), ViewModelStoreOwner {
+    private val viewModelProvider =
+        ViewModelProvider(this, ViewModelProvider.AndroidViewModelFactory.getInstance(this))
+
+
+    override fun getViewModelStore(): ViewModelStore = ViewModelStore()
+
     companion object {
         lateinit var appContext: Context
             private set
         lateinit var dateRepository: DataRepository
+            private set
+
+        lateinit var playerViewModel: PlayerViewModel
+            private set
+
     }
 
     override fun onCreate() {
         super.onCreate()
         logD("App onCreate")
         appContext = applicationContext
-        //TODO 不能在这里请求contentprovider，要权限
         AudioPlayer.INSTANCE.init(appContext)
         Preference.init(this)
         dateRepository = Injection.provideDataRepository(appContext)
+
+        playerViewModel = obtainViewModel(PlayerViewModel::class.java)
+        playerViewModel.start()
     }
 
     fun todo() {
@@ -39,9 +52,14 @@ class App : Application() {
         //TODO 当没有音乐的时候 ok
         //TODO MVVM重构
 
-
-
         //TODO 1、BUG 数组越界判断，无歌曲，错误的下标
         //TODO 2、
     }
+
+
+    private fun <T : ViewModel> obtainViewModel(clazz: Class<T>): T {
+        return viewModelProvider.get(clazz)
+    }
+
+
 }

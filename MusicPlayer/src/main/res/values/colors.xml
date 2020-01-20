@@ -6,4 +6,6 @@
     <color name="black">#000</color>
     <color name="white">#fff</color>
     <color name="whiteTransparent">#10000000</color>
+    <color name="bottomNavBackground">#FFFFFF</color>
+    <drawable name="nav_btm_color">#000000</drawable>
 </resources>
