@@ -163,4 +163,16 @@ class DataRepository(
         })
     }
 
+    fun getTrackDetail(id: Long, callback: Callback<TrackData>) {
+        netMusicDataSource.loadTrackDetail(id, object : Callback<TrackResponse> {
+            override fun onLoaded(t: TrackResponse) {
+                callback.onLoaded(t.data[0])
+            }
+
+            override fun onFailed(mes: String) {
+                callback.onFailed(mes)
+            }
+        })
+    }
+
 }

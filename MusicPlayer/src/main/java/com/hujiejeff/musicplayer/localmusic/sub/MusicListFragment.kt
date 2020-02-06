@@ -34,7 +34,8 @@ class MusicListFragment : AbstractLazyLoadFragment() {
         view.rv_list.apply {
             adapter = MusicRecyclerViewAdapter().apply {
                 setOnItemClickListener {
-                    AudioPlayer.INSTANCE.play(it)
+
+                    App.playerViewModel.play(it)
                 }
             }
             layoutManager = LinearLayoutManager(context, RecyclerView.VERTICAL, false)

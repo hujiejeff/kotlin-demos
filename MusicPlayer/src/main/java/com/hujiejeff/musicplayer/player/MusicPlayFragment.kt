@@ -48,12 +48,14 @@ class MusicPlayFragment : BaseFragment(), SeekBar.OnSeekBarChangeListener {
             viewModel.musicItems.value?.forEach {
                 fragmentList.add(
                     AlbumCardFragment(
-                        it.albumID
+                        getLocalCoverUrl(it.albumID)
                     )
                 )
             }
+
             play_view_pager.adapter = PlayAlbumPagerAdapter()
-            play_view_pager.setPageTransformer(true,
+            play_view_pager.setPageTransformer(
+                true,
                 ScaleTransformer()
             )
             play_view_pager.addOnPageChangeListener(object : ViewPager.OnPageChangeListener {
@@ -133,9 +135,14 @@ class MusicPlayFragment : BaseFragment(), SeekBar.OnSeekBarChangeListener {
             })
 
             //music progress
-            playProgress.observe(homeActivity, Observer {
-                view?.seek_bar?.progress = it
-                view?.tv_current_time?.text = getMusicTimeFormatString(it)
+            playProgress.observe(homeActivity, Observer {progress ->
+                view?.seek_bar?.progress = progress
+                view?.tv_current_time?.text = getMusicTimeFormatString(progress)
+            })
+
+            //music buffer progress
+            bufferProgress.observe(homeActivity, Observer {bufferProgress->
+                view?.seek_bar?.secondaryProgress = bufferProgress
             })
 
             //music mode
@@ -153,6 +160,21 @@ class MusicPlayFragment : BaseFragment(), SeekBar.OnSeekBarChangeListener {
                     }
                 }
             })
+
+            position.observe(homeActivity, Observer { index->
+                view?.play_view_pager?.setCurrentItem(index, true)
+            })
+
+            musicItems.observe(homeActivity, Observer { list ->
+                fragmentList.clear()
+                list.forEach { music ->
+                    val src = if (music.type == 0) getLocalCoverUrl(music.albumID) else music.coverSrc
+                    fragmentList.add(
+                        AlbumCardFragment(src!!)
+                    )
+                }
+                view?.play_view_pager?.adapter?.notifyDataSetChanged()
+            })
         }
 
 
@@ -166,21 +188,21 @@ class MusicPlayFragment : BaseFragment(), SeekBar.OnSeekBarChangeListener {
             seek_bar.progress = 0
             tv_current_time.text = getMusicTimeFormatString(Preference.play_progress)
             tv_max_time.text = getMusicTimeFormatString(duration.toInt())
-            play_view_pager.setCurrentItem(AudioPlayer.INSTANCE.mMusicList.indexOf(music), true)
         }
         val isShuffle = Preference.play_mode == PlayMode.SHUFFLE.value
         iv_play_mode_loop.setImageLevel(if (isShuffle) 0 else Preference.play_mode)
         iv_play_mode_shuffle.isSelected = isShuffle
     }
 
-    class AlbumCardFragment(private val albumID: Long) : Fragment() {
+    class AlbumCardFragment(private val src: String) : Fragment() {
         override fun onCreateView(
             inflater: LayoutInflater,
             container: ViewGroup?,
             savedInstanceState: Bundle?
         ): View? {
             val view = inflater.inflate(R.layout.card_album, container, false)
-            view.album_cover.loadCover(albumID)
+
+            view.album_cover.loadPlayListCover(src)
             return view
         }
     }

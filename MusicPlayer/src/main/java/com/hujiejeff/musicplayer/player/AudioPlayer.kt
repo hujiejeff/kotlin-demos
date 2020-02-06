@@ -144,7 +144,7 @@ class AudioPlayer private constructor() {
             state = STATUS_PREPARING
             if (!isResume) {
                 triggerListener {
-                    onChange(music)
+                    onChange(music, position)
                 }
             }
         }

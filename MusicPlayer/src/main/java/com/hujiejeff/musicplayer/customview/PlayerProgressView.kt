@@ -40,7 +40,6 @@ class PlayerProgressView(context: Context, attrs: AttributeSet?, defStyleAttr: I
         set(value) {
             field = value
             mProgressAngle = (progress * 1.0f / max) * 360f
-            logD("hujie" + mProgressAngle.toString())
             mRotate = (mRotate + 1) % 360
             invalidate()
         }

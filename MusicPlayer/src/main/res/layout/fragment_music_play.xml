@@ -16,6 +16,7 @@
         android:layout_height="400dp" />
 
     <SeekBar
+        android:secondaryProgressTint="@color/colorPrimaryDark"
         android:id="@+id/seek_bar"
         android:layout_width="match_parent"
         android:thumb="@drawable/seek"

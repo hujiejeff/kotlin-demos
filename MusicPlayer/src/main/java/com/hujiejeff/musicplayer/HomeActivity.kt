@@ -87,7 +87,12 @@ class HomeActivity : BaseActivity() {
                 Observer<Music> { music ->
                     ppv_player.max = music.duration.toInt()
                     ppv_player.progress = if (!isPlay.value!!) Preference.play_progress else 0
-                    ppv_player.setBitmap(getCover(music.albumID))
+
+                    if (music.type == 1) {
+                        ppv_player.setSrc(music.coverSrc!!)
+                    } else {
+                        ppv_player.setBitmap(getCover(music.albumID))
+                    }
                 })
 
             playProgress.observe(this@HomeActivity, Observer<Int> { progress ->
@@ -140,6 +145,7 @@ class HomeActivity : BaseActivity() {
     private fun showAndHidFragment(showIndex: Int, hideIndex: Int) {
         if (showIndex != hideIndex) {
             transaction {
+                supportFragmentManager.popBackStackImmediate()
                 hide(fragments[hideIndex])
                 show(fragments[showIndex])
             }

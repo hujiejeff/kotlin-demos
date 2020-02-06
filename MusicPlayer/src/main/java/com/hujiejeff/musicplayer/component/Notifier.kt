@@ -6,15 +6,21 @@ import android.app.NotificationManager
 import android.app.PendingIntent
 import android.content.Context
 import android.content.Intent
+import android.graphics.Bitmap
+import android.graphics.drawable.Drawable
 import android.os.Build
 import android.widget.RemoteViews
 import androidx.core.app.NotificationCompat
+import com.bumptech.glide.Glide
+import com.bumptech.glide.request.target.CustomTarget
+import com.bumptech.glide.request.transition.Transition
 import com.hujiejeff.musicplayer.R
 import com.hujiejeff.musicplayer.constans.EXTRA_NOTIFICATION
 import com.hujiejeff.musicplayer.data.entity.Music
 import com.hujiejeff.musicplayer.HomeActivity
 import com.hujiejeff.musicplayer.service.PlayService
 import com.hujiejeff.musicplayer.util.getCover
+import com.hujiejeff.musicplayer.util.getLocalCoverUrl
 
 /**
  * Create by hujie on 2019/12/31
@@ -92,7 +98,19 @@ class Notifier {
         music.apply {
             remoteViews.apply {
                 //UI信息
-                setImageViewBitmap(R.id.iv_status_bar_cover, getCover(albumID))
+                val src: String = if (music.type == 1) {
+                    coverSrc!!
+                } else {
+                    getLocalCoverUrl(albumID)
+                }
+                Glide.with(context).asBitmap().load(coverSrc).into(object : CustomTarget<Bitmap>() {
+                    override fun onLoadCleared(placeholder: Drawable?) {
+                    }
+
+                    override fun onResourceReady(resource: Bitmap, transition: Transition<in Bitmap>?) {
+                        setImageViewBitmap(R.id.iv_status_bar_cover, resource)
+                    }
+                })
                 setTextViewText(R.id.tv_status_bar_title, title)
                 setTextViewText(R.id.tv_status_bar_artist, artist)
                 setImageViewResource(R.id.iv_status_bar_play, getPlayIconRes(isPlaying))

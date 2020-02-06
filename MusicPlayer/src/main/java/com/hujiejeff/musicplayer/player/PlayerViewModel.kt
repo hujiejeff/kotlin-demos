@@ -1,14 +1,15 @@
 package com.hujiejeff.musicplayer.player
 
+import android.media.MediaMetadataRetriever
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import com.hujiejeff.musicplayer.base.App
 import com.hujiejeff.musicplayer.data.Preference
-import com.hujiejeff.musicplayer.data.entity.Music
-import com.hujiejeff.musicplayer.data.entity.PlayMode
-import com.hujiejeff.musicplayer.data.entity.toPlayMode
+import com.hujiejeff.musicplayer.data.entity.*
+import com.hujiejeff.musicplayer.data.source.Callback
 import com.hujiejeff.musicplayer.util.logD
+import kotlin.math.log
 
 class PlayerViewModel: ViewModel(), OnPlayerEventListener {
     private val dataRepository by lazy { App.dateRepository }
@@ -30,6 +31,10 @@ class PlayerViewModel: ViewModel(), OnPlayerEventListener {
     val playProgress: LiveData<Int>
         get() = _playProgress
 
+    private val _bufferProgress = MutableLiveData<Int>()
+    val bufferProgress: LiveData<Int>
+        get() = _bufferProgress
+
     //播放模式
     private val _playMode = MutableLiveData<PlayMode>().apply { value = Preference.play_mode.toPlayMode() }
     val playMode: LiveData<PlayMode>
@@ -44,6 +49,14 @@ class PlayerViewModel: ViewModel(), OnPlayerEventListener {
 
     //音乐列表
     val musicItems = MutableLiveData<List<Music>>()
+
+    //播放索引
+    val position = MutableLiveData<Int>()
+
+
+
+    //当前播放列表模式，网络 or 本地
+    private val isPlayNetMusic = false
 
     fun start() {
         //注册播放监听
@@ -61,6 +74,23 @@ class PlayerViewModel: ViewModel(), OnPlayerEventListener {
 
     //播放
     fun play(position: Int) {
+        val music = musicItems.value?.get(position)
+        logD(music.toString())
+        if (music?.type == 1) {
+            //网络歌曲需要根据ID加载播放url等信息
+            dataRepository.getTrackDetail(music.id, object : Callback<TrackData>{
+                override fun onLoaded(t: TrackData) {
+                    music.filePath = t.url
+                    music.fileSize = t.size
+                    music.duration = t.size * 8 * 1000 / t.br
+                    player.play(position)
+                }
+
+                override fun onFailed(mes: String) {
+                }
+            })
+            return
+        }
         player.play(position)
     }
 
@@ -116,11 +146,33 @@ class PlayerViewModel: ViewModel(), OnPlayerEventListener {
     }
 
 
+    //加载本地音乐列表
+    fun loadLocalMusicList(musicList: List<Music>) {
+        musicItems.value = musicList
+    }
+
+    //加载网络音乐列表
+    fun loadNetMusicList(trackList: List<Track>) {
+
+        val list = MutableList(trackList.size) { index ->
+            val track = trackList[index]
+            val al = track.al
+            val ar = track.ar
+            val music = Music(track.id, 1, ar[0].name, "", "", al.id, al.name, track.name, 0L,0L)
+            music.coverSrc = al.picUrl
+            music
+        }
+        musicItems.value = list
+        AudioPlayer.INSTANCE.mMusicList = list
+    }
+
+
     /**
      * 播放监听回调
      * */
-    override fun onChange(music: Music) {
+    override fun onChange(music: Music, p: Int) {
         _currentMusic.value = music
+        position.value = p
     }
 
     override fun onPlayerStart() {
@@ -137,6 +189,7 @@ class PlayerViewModel: ViewModel(), OnPlayerEventListener {
 
     override fun onBufferingUpdate(percent: Int) {
         //暂不需要
+        _bufferProgress.value = (percent * _currentMusic.value!!.duration / 100).toInt()
     }
 
     override fun onModeChange(value: Int) {

@@ -39,10 +39,16 @@ class ExampleUnitTest {
         println(response.body().toString())
     }
 
+    @Test
+    fun testGetMusicUrl() {
+        val  response = getRetrofitApis().getMusicUrl(513359463).execute()
+        println(response.body().toString())
+    }
+
     fun getRetrofitApis(): Apis =
         Retrofit
             .Builder()
-            .baseUrl("http://musicapi.leanapp.cn")
+            .baseUrl("http://localhost:3000")
             .addConverterFactory(GsonConverterFactory.create())
             .build().create(Apis::class.java)
 

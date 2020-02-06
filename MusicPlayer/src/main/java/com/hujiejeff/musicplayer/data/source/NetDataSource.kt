@@ -3,6 +3,7 @@ package com.hujiejeff.musicplayer.data.source
 import com.hujiejeff.musicplayer.data.entity.PlayListCatlistResponse
 import com.hujiejeff.musicplayer.data.entity.PlayListDetailResponse
 import com.hujiejeff.musicplayer.data.entity.PlayListsResponse
+import com.hujiejeff.musicplayer.data.entity.TrackResponse
 
 
 /**
@@ -19,5 +20,8 @@ interface NetDataSource {
 
     //获取歌单详情响应
     fun loadPlaylistDetail(id: Long, callback: Callback<PlayListDetailResponse>)
+
+    //获取具体歌曲信息
+    fun loadTrackDetail(id: Long, callback: Callback<TrackResponse>)
 
 }

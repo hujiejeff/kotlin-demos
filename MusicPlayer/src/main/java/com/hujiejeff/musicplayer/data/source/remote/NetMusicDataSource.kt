@@ -15,6 +15,8 @@ class NetMusicDataSource(
     private val apis: Apis,
     private val appExecutors: AppExecutors
 ) : NetDataSource {
+
+
     override fun loadPlayListCatList(callback: Callback<PlayListCatlistResponse>) {
         networkIOExecute {
             val response = apis.getPlayListCatList().execute()
@@ -62,6 +64,19 @@ class NetMusicDataSource(
         }
     }
 
+
+    override fun loadTrackDetail(id: Long, callback: Callback<TrackResponse>) {
+        networkIOExecute {
+            val response = apis.getMusicUrl(id).execute()
+            mainThreadExecute {
+                if (response.isSuccessful && response.body().code == 200) {
+                    callback.onLoaded(response.body())
+                } else {
+                    callback.onFailed(response.errorBody().string())
+                }
+            }
+        }
+    }
 
     private fun networkIOExecute(action: () -> Unit) {
         appExecutors.networkIO.execute(action)

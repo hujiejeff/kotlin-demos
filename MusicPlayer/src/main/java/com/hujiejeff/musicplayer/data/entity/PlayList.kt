@@ -59,3 +59,6 @@ data class Ar(val id: Long, val name: String)
 //专辑
 data class Al(val id: Long, val name: String, val picUrl: String)
 
+
+data class TrackResponse(val code: Int, val data: List<TrackData>)
+data class TrackData(val id: Long, val url: String, val size: Long, val br: Int)

@@ -6,7 +6,7 @@ interface OnPlayerEventListener {
     /*
     * 切换歌曲
     * */
-    fun onChange(music: Music)
+    fun onChange(music: Music, position: Int)
 
     /*
     * 播放开始

@@ -3,6 +3,7 @@ package com.hujiejeff.musicplayer.data.source.remote
 import com.hujiejeff.musicplayer.data.entity.PlayListCatlistResponse
 import com.hujiejeff.musicplayer.data.entity.PlayListDetailResponse
 import com.hujiejeff.musicplayer.data.entity.PlayListsResponse
+import com.hujiejeff.musicplayer.data.entity.TrackResponse
 import retrofit2.Call
 import retrofit2.http.GET
 import retrofit2.http.Query
@@ -11,7 +12,7 @@ import retrofit2.http.Query
  * Create by hujie on 2020/1/8
  */
 
-public const val baseUrl = "http://192.168.137.1:3000"
+const val baseUrl = "http://192.168.137.1:3000"
 
 interface Apis {
 
@@ -73,7 +74,7 @@ interface Apis {
      * 可选参数 : br: 码率,默认设置了 999000 即最大码率,如果要 320k 则可设置为 320000,其他类推
      * */
     @GET("song/url")
-    fun getMusicUrl(@Query("id") id: Int, @Query("br") br: Int)
+    fun getMusicUrl(@Query("id") id: Long, @Query("br") br: Int = 999000): Call<TrackResponse>
 
     /**
      * 检测音乐是否可用

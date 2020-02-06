@@ -50,6 +50,7 @@ fun getMusicList(): MutableList<Music> {
     ) ?: return musicList
     while (cursor.moveToNext()) {
         cursor.apply {
+            val id = getLong(cursor.getColumnIndex(_ID))
             val title = getString(cursor.getColumnIndex(TITLE))
             val artist = getString(cursor.getColumnIndex(ARTIST))
             val album = getString(cursor.getColumnIndex(ALBUM))
@@ -58,7 +59,7 @@ fun getMusicList(): MutableList<Music> {
             val albumId = getLong(cursor.getColumnIndex(ALBUM_ID))
             val duration = getLong(cursor.getColumnIndex(DURATION))
             val size = getLong(cursor.getColumnIndex(SIZE))
-            musicList.add(Music(artist, displayName, path, albumId, album, title, duration, size))
+            musicList.add(Music(id, 0, artist, displayName, path, albumId, album, title, duration, size))
         }
     }
     cursor.close()
@@ -94,6 +95,12 @@ fun getArtistList(): MutableList<Artist> {
     }
     cursor.close()
     return artistList
+}
+
+fun getLocalCoverUrl(albumID: Long): String {
+    val artUri = Uri.parse("content://media/external/audio/albumart")
+    val uri = ContentUris.withAppendedId(artUri, albumID)
+    return uri.toString()
 }
 
 fun ImageView.loadCover(albumID: Long) {

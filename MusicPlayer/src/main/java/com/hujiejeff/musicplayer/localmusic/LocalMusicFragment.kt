@@ -42,8 +42,6 @@ class LocalMusicFragment : BaseFragment() {
         override fun getCount() = fragmentList.size
         override fun getItem(position: Int) = fragmentList[position]
         override fun getPageTitle(position: Int): CharSequence?  {
-            logD("hujie123")
-            logD("hujie:"+ titleList[position])
             return titleList[position]
         }
     }
