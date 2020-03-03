@@ -5,7 +5,7 @@ import com.hujiejeff.musicplayer.data.entity.Artist
 import com.hujiejeff.musicplayer.data.entity.Music
 import com.hujiejeff.musicplayer.data.source.Callback
 import com.hujiejeff.musicplayer.data.source.LocalDataSource
-import com.hujiejeff.musicplayer.execute.AppExecutors
+import com.hujiejeff.musicplayer.component.AppExecutors
 import com.hujiejeff.musicplayer.util.getAlbumList
 import com.hujiejeff.musicplayer.util.getArtistList
 import com.hujiejeff.musicplayer.util.getMusicList

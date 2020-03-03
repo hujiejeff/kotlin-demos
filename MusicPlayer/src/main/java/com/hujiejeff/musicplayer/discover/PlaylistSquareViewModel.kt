@@ -7,9 +7,10 @@ import com.hujiejeff.musicplayer.base.App
 import com.hujiejeff.musicplayer.data.entity.PlayList
 import com.hujiejeff.musicplayer.data.entity.SubCat
 import com.hujiejeff.musicplayer.data.source.Callback
+import com.hujiejeff.musicplayer.data.source.DataRepository
 import com.hujiejeff.musicplayer.util.logD
 
-class PlaylistSquareViewModel: ViewModel() {
+class PlaylistSquareViewModel(private val dataRepository: DataRepository): ViewModel() {
 
     //歌单分类
     private val _subCatList = MutableLiveData<List<SubCat>>().apply { value = mutableListOf() }
@@ -28,7 +29,7 @@ class PlaylistSquareViewModel: ViewModel() {
 
 
     fun loadSubCat() {
-        App.dateRepository.getSubCat(object : Callback<List<SubCat>> {
+        dataRepository.getSubCat(object : Callback<List<SubCat>> {
             override fun onLoaded(t: List<SubCat>) {
                 t.forEach { subCat ->
                     playListMap[subCat] = MutableLiveData()
@@ -47,7 +48,7 @@ class PlaylistSquareViewModel: ViewModel() {
 
     fun loadPlaylists(subCat: SubCat) {
         loadingMap[subCat]?.value = true
-        App.dateRepository.getPlayLists(subCat.name, 10, "hot", object : Callback<List<PlayList>> {
+        dataRepository.getPlayLists(subCat.name, 10, "hot", object : Callback<List<PlayList>> {
             override fun onLoaded(t: List<PlayList>) {
                 playListMap[subCat]?.value = t
                 loadingMap[subCat]?.value = false

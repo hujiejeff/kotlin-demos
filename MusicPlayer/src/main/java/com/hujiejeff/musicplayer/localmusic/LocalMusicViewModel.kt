@@ -8,10 +8,10 @@ import com.hujiejeff.musicplayer.data.entity.Album
 import com.hujiejeff.musicplayer.data.entity.Artist
 import com.hujiejeff.musicplayer.data.entity.Music
 import com.hujiejeff.musicplayer.data.source.Callback
+import com.hujiejeff.musicplayer.data.source.DataRepository
 import com.hujiejeff.musicplayer.player.AudioPlayer
 
-class LocalMusicViewModel: ViewModel() {
-    private val dataRepository by lazy { App.dateRepository }
+class LocalMusicViewModel(private val dataRepository: DataRepository): ViewModel() {
     private val player: AudioPlayer = AudioPlayer.INSTANCE
 
     //数据加载

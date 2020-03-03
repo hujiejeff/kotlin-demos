@@ -20,6 +20,7 @@ import com.hujiejeff.musicplayer.data.source.Callback
 import com.hujiejeff.musicplayer.discover.PlaylistViewModel
 import com.hujiejeff.musicplayer.util.loadPlayListCover
 import com.hujiejeff.musicplayer.util.logD
+import com.hujiejeff.musicplayer.util.obtainViewModel
 import kotlinx.android.synthetic.main.fragment_list.view.*
 import kotlinx.android.synthetic.main.fragment_playlist.view.*
 import kotlinx.android.synthetic.main.fragment_playlist.view.loading_view
@@ -77,9 +78,11 @@ class PlaylistFragment(private val id: Long, private val url: String) : Abstract
 
     override fun onAttach(context: Context) {
         super.onAttach(context)
-        viewModel = ViewModelProviders.of(this).get(PlaylistViewModel::class.java)
+        viewModel = obtainViewModel()
         subscribe()
     }
+
+    private fun obtainViewModel() = obtainViewModel(PlaylistViewModel::class.java)
 
     private fun subscribe() {
         viewModel.apply {

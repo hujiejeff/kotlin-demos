@@ -3,6 +3,7 @@ package com.hujiejeff.musicplayer.data.source
 import com.hujiejeff.musicplayer.data.entity.*
 import com.hujiejeff.musicplayer.data.source.local.LocalMusicDataSource
 import com.hujiejeff.musicplayer.data.source.remote.NetMusicDataSource
+import java.util.*
 
 /**
  * Create by hujie on 2020/1/3
@@ -167,6 +168,42 @@ class DataRepository(
         netMusicDataSource.loadTrackDetail(id, object : Callback<TrackResponse> {
             override fun onLoaded(t: TrackResponse) {
                 callback.onLoaded(t.data[0])
+            }
+
+            override fun onFailed(mes: String) {
+                callback.onFailed(mes)
+            }
+        })
+    }
+
+    fun getRecommendPlaylists(limit: Int, callback: Callback<List<RecommendPlayList>>) {
+        netMusicDataSource.loadRecommendPlaylists(limit, object : Callback<RecommendPlayListResponse> {
+            override fun onLoaded(t: RecommendPlayListResponse) {
+                callback.onLoaded(t.result)
+            }
+
+            override fun onFailed(mes: String) {
+                callback.onFailed(mes)
+            }
+        })
+    }
+
+    fun getNewAlbums(count: Int, callback: Callback<List<RecommendNewAlbum>>) {
+        netMusicDataSource.loadRecommendNewAlbum(object : Callback<RecommendNewAlbumResponse> {
+            override fun onLoaded(t: RecommendNewAlbumResponse) {
+                callback.onLoaded(t.albums.take(count))
+            }
+
+            override fun onFailed(mes: String) {
+                callback.onFailed(mes)
+            }
+        })
+    }
+
+    fun getNewSongs(count: Int, callback: Callback<List<RecommendNewSong>>) {
+        netMusicDataSource.loadRecommendNewSong(object : Callback<RecommendNewSongResponse> {
+            override fun onLoaded(t: RecommendNewSongResponse) {
+                callback.onLoaded(t.result.take(count))
             }
 
             override fun onFailed(mes: String) {

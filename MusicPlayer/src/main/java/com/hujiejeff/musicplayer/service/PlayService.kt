@@ -9,7 +9,7 @@ import com.hujiejeff.musicplayer.component.HeadSetReceiver
 import com.hujiejeff.musicplayer.component.Notifier
 import com.hujiejeff.musicplayer.component.NotifyBarReceiver
 import com.hujiejeff.musicplayer.data.entity.Music
-import com.hujiejeff.musicplayer.execute.AppExecutors
+import com.hujiejeff.musicplayer.component.AppExecutors
 import com.hujiejeff.musicplayer.player.AudioPlayer
 import com.hujiejeff.musicplayer.util.getMusicList
 

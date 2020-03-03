@@ -62,3 +62,16 @@ data class Al(val id: Long, val name: String, val picUrl: String)
 
 data class TrackResponse(val code: Int, val data: List<TrackData>)
 data class TrackData(val id: Long, val url: String, val size: Long, val br: Int)
+
+//首页
+
+data class RecommendPlayList(val id: Long, val name: String, val picUrl: String, val playCount: Int)
+data class RecommendPlayListResponse(val code: Int, val result: List<RecommendPlayList>)
+
+
+data class Song(val artists: List<Ar>)
+data class RecommendNewSong(val id: Long, val name: String, val picUrl: String, val song: Song)
+data class RecommendNewSongResponse(val code: Int, val result: List<RecommendNewSong>)
+
+data class RecommendNewAlbum(val id: Long, val name: String, val picUrl: String, val artist: Ar)
+data class RecommendNewAlbumResponse(val code: Int, val albums: List<RecommendNewAlbum>)

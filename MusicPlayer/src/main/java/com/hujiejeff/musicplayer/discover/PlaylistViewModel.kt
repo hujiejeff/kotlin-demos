@@ -6,9 +6,10 @@ import androidx.lifecycle.ViewModel
 import com.hujiejeff.musicplayer.base.App
 import com.hujiejeff.musicplayer.data.entity.PlayListDetail
 import com.hujiejeff.musicplayer.data.source.Callback
+import com.hujiejeff.musicplayer.data.source.DataRepository
 
 
-class PlaylistViewModel:ViewModel() {
+class PlaylistViewModel(private val dataRepository: DataRepository):ViewModel() {
     private val _loading = MutableLiveData<Boolean>()
     val loading: LiveData<Boolean>
         get() = _loading
@@ -19,7 +20,7 @@ class PlaylistViewModel:ViewModel() {
 
     fun loadPlaylistDetail(id: Long) {
         _loading.value = true
-        App.dateRepository.getPlayListDetail(id, object : Callback<PlayListDetail> {
+        dataRepository.getPlayListDetail(id, object : Callback<PlayListDetail> {
             override fun onLoaded(t: PlayListDetail) {
                 _playlistDetail.value = t
 

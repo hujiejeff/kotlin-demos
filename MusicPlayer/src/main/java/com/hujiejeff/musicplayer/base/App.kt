@@ -4,6 +4,7 @@ import android.app.Application
 import android.content.Context
 import androidx.lifecycle.*
 import com.hujiejeff.musicplayer.Injection
+import com.hujiejeff.musicplayer.ViewModelFactory
 import com.hujiejeff.musicplayer.player.AudioPlayer
 import com.hujiejeff.musicplayer.data.Preference
 import com.hujiejeff.musicplayer.data.source.DataRepository
@@ -11,16 +12,15 @@ import com.hujiejeff.musicplayer.player.PlayerViewModel
 import com.hujiejeff.musicplayer.util.logD
 
 class App : Application(), ViewModelStoreOwner {
-    private val viewModelProvider =
-        ViewModelProvider(this, ViewModelProvider.AndroidViewModelFactory.getInstance(this))
+    private val viewModelProvider by lazy {
+        ViewModelProvider(this, ViewModelFactory.getInstance(this))
+    }
 
 
     override fun getViewModelStore(): ViewModelStore = ViewModelStore()
 
     companion object {
         lateinit var appContext: Context
-            private set
-        lateinit var dateRepository: DataRepository
             private set
 
         lateinit var playerViewModel: PlayerViewModel
@@ -34,7 +34,6 @@ class App : Application(), ViewModelStoreOwner {
         appContext = applicationContext
         AudioPlayer.INSTANCE.init(appContext)
         Preference.init(this)
-        dateRepository = Injection.provideDataRepository(appContext)
 
         playerViewModel = obtainViewModel(PlayerViewModel::class.java)
         playerViewModel.start()

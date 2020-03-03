@@ -9,6 +9,7 @@ import com.hujiejeff.musicplayer.localmusic.sub.AlbumListFragment
 import com.hujiejeff.musicplayer.localmusic.sub.ArtistListFragment
 import com.hujiejeff.musicplayer.localmusic.sub.MusicListFragment
 import com.hujiejeff.musicplayer.util.logD
+import com.hujiejeff.musicplayer.util.obtainViewModel
 import kotlinx.android.synthetic.main.home_fragment_my.view.*
 
 
@@ -33,7 +34,8 @@ class LocalMusicFragment : BaseFragment() {
     }
 
     fun obtainViewModel(): LocalMusicViewModel {
-        return  ViewModelProviders.of(this).get(LocalMusicViewModel::class.java)
+//        return  ViewModelProviders.of(this).get(LocalMusicViewModel::class.java)
+        return obtainViewModel(LocalMusicViewModel::class.java)
     }
 
 

@@ -16,4 +16,10 @@
     android:layout_marginLeft="100dp"
     android:layout_width="25dp"
     android:layout_height="25dp"/>
+
+    <ImageView android:src="@drawable/avd_hook2" android:layout_width="171dp"
+        android:layout_height="166dp"
+        app:layout_constraintStart_toStartOf="parent"
+        android:layout_marginTop="44dp"
+        android:id="@+id/iv_hook2"/>
 </LinearLayout>

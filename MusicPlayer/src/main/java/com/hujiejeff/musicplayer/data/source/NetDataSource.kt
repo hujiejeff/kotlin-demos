@@ -1,9 +1,6 @@
 package com.hujiejeff.musicplayer.data.source
 
-import com.hujiejeff.musicplayer.data.entity.PlayListCatlistResponse
-import com.hujiejeff.musicplayer.data.entity.PlayListDetailResponse
-import com.hujiejeff.musicplayer.data.entity.PlayListsResponse
-import com.hujiejeff.musicplayer.data.entity.TrackResponse
+import com.hujiejeff.musicplayer.data.entity.*
 
 
 /**
@@ -23,5 +20,14 @@ interface NetDataSource {
 
     //获取具体歌曲信息
     fun loadTrackDetail(id: Long, callback: Callback<TrackResponse>)
+
+    //首页推荐歌单
+    fun loadRecommendPlaylists(limit: Int, callback: Callback<RecommendPlayListResponse>)
+
+    //首页最新专辑
+    fun loadRecommendNewAlbum(callback: Callback<RecommendNewAlbumResponse>)
+
+    //首页最新歌曲
+    fun loadRecommendNewSong(callback: Callback<RecommendNewSongResponse>)
 
 }

@@ -1,9 +1,6 @@
 package com.hujiejeff.musicplayer.data.source.remote
 
-import com.hujiejeff.musicplayer.data.entity.PlayListCatlistResponse
-import com.hujiejeff.musicplayer.data.entity.PlayListDetailResponse
-import com.hujiejeff.musicplayer.data.entity.PlayListsResponse
-import com.hujiejeff.musicplayer.data.entity.TrackResponse
+import com.hujiejeff.musicplayer.data.entity.*
 import retrofit2.Call
 import retrofit2.http.GET
 import retrofit2.http.Query
@@ -12,7 +9,7 @@ import retrofit2.http.Query
  * Create by hujie on 2020/1/8
  */
 
-const val baseUrl = "http://192.168.137.1:3000"
+const val baseUrl = "http://172.20.10.4:3000"
 
 interface Apis {
 
@@ -110,6 +107,16 @@ interface Apis {
      * */
     @GET("search/suggest")
     fun getSearchSuggest(@Query("keywords") keywords: String, @Query("type") type: String = "mobile")
+
+
+    @GET("personalized")
+    fun getRecommendPlaylist(@Query("limit") limit: Int): Call<RecommendPlayListResponse>
+
+    @GET("personalized/newsong")
+    fun getNewSong(): Call<RecommendNewSongResponse>
+
+    @GET("/album/newest")
+    fun getNewAlbum(): Call<RecommendNewAlbumResponse>
 
 
 }

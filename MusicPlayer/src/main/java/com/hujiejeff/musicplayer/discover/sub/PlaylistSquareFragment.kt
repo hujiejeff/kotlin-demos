@@ -15,6 +15,7 @@ import com.hujiejeff.musicplayer.data.entity.SubCat
 import com.hujiejeff.musicplayer.data.source.Callback
 import com.hujiejeff.musicplayer.discover.PlaylistSquareViewModel
 import com.hujiejeff.musicplayer.util.logD
+import com.hujiejeff.musicplayer.util.obtainViewModel
 import kotlinx.android.synthetic.main.fragment_playlist_square.view.*
 
 /**
@@ -75,8 +76,7 @@ class PlaylistSquareFragment : AbstractLazyLoadFragment() {
         viewModel.loadSubCat()
     }
 
-    fun obtainViewModel(): PlaylistSquareViewModel =
-        ViewModelProviders.of(this).get(PlaylistSquareViewModel::class.java)
+    fun obtainViewModel(): PlaylistSquareViewModel = obtainViewModel(PlaylistSquareViewModel::class.java)
 
     inner class PagerAdapter :
         FragmentPagerAdapter(childFragmentManager, BEHAVIOR_RESUME_ONLY_CURRENT_FRAGMENT) {

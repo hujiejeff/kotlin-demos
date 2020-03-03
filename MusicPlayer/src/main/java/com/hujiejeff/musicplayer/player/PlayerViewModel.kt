@@ -1,18 +1,15 @@
 package com.hujiejeff.musicplayer.player
 
-import android.media.MediaMetadataRetriever
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
-import com.hujiejeff.musicplayer.base.App
 import com.hujiejeff.musicplayer.data.Preference
 import com.hujiejeff.musicplayer.data.entity.*
 import com.hujiejeff.musicplayer.data.source.Callback
+import com.hujiejeff.musicplayer.data.source.DataRepository
 import com.hujiejeff.musicplayer.util.logD
-import kotlin.math.log
 
-class PlayerViewModel: ViewModel(), OnPlayerEventListener {
-    private val dataRepository by lazy { App.dateRepository }
+class PlayerViewModel(private val dataRepository: DataRepository): ViewModel(), OnPlayerEventListener {
 
     private val player: AudioPlayer = AudioPlayer.INSTANCE
 

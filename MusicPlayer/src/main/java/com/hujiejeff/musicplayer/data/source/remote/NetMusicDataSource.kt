@@ -3,9 +3,7 @@ package com.hujiejeff.musicplayer.data.source.remote
 import com.hujiejeff.musicplayer.data.entity.*
 import com.hujiejeff.musicplayer.data.source.Callback
 import com.hujiejeff.musicplayer.data.source.NetDataSource
-import com.hujiejeff.musicplayer.execute.AppExecutors
-import retrofit2.Call
-import retrofit2.Response
+import com.hujiejeff.musicplayer.component.AppExecutors
 
 
 /**
@@ -86,4 +84,42 @@ class NetMusicDataSource(
         appExecutors.mainThread.execute(action)
     }
 
+    override fun loadRecommendPlaylists(limit: Int, callback: Callback<RecommendPlayListResponse>) {
+        networkIOExecute {
+            val response = apis.getRecommendPlaylist(limit).execute()
+            mainThreadExecute {
+                if (response.isSuccessful && response.body().code == 200) {
+                    callback.onLoaded(response.body())
+                } else {
+                    callback.onFailed(response.errorBody().string())
+                }
+            }
+        }
+    }
+
+    override fun loadRecommendNewAlbum(callback: Callback<RecommendNewAlbumResponse>) {
+        networkIOExecute {
+            val response = apis.getNewAlbum().execute()
+            mainThreadExecute {
+                if (response.isSuccessful && response.body().code == 200) {
+                    callback.onLoaded(response.body())
+                } else {
+                    callback.onFailed(response.errorBody().string())
+                }
+            }
+        }
+    }
+
+    override fun loadRecommendNewSong(callback: Callback<RecommendNewSongResponse>) {
+        networkIOExecute {
+            val response = apis.getNewSong().execute()
+            mainThreadExecute {
+                if (response.isSuccessful && response.body().code == 200) {
+                    callback.onLoaded(response.body())
+                } else {
+                    callback.onFailed(response.errorBody().string())
+                }
+            }
+        }
+    }
 }

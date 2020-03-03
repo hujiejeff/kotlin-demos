@@ -45,6 +45,19 @@ class ExampleUnitTest {
         println(response.body().toString())
     }
 
+    @Test
+    fun testGetRecommendNewSong(){
+        val response = getRetrofitApis().getNewSong().execute()
+        println(response.body().toString())
+    }
+
+    @Test
+    fun testGetRecommendNewAlbum(){
+        val response = getRetrofitApis().getNewAlbum().execute()
+        println(response.body().toString())
+    }
+
+
     fun getRetrofitApis(): Apis =
         Retrofit
             .Builder()
