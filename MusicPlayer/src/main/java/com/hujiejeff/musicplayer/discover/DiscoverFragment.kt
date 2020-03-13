@@ -2,8 +2,8 @@ package com.hujiejeff.musicplayer.discover
 
 import android.Manifest
 import android.content.Context
+import android.content.Intent
 import android.view.View
-import android.widget.BaseAdapter
 import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.Observer
@@ -12,16 +12,17 @@ import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.hujiejeff.musicplayer.R
 import com.hujiejeff.musicplayer.base.AbstractLazyLoadFragment
-import com.hujiejeff.musicplayer.base.BaseFragment
 import com.hujiejeff.musicplayer.base.BaseRecyclerViewAdapter
 import com.hujiejeff.musicplayer.base.BaseViewHolder
 import com.hujiejeff.musicplayer.data.entity.*
-import com.hujiejeff.musicplayer.discover.sub.PlaylistSquareFragment
+import com.hujiejeff.musicplayer.discover.playlist.PlaylistActivity
+import com.hujiejeff.musicplayer.discover.playlistsqure.MainPlaylistActivity
+import com.hujiejeff.musicplayer.discover.search.SearchActivity
 import com.hujiejeff.musicplayer.util.*
 import kotlinx.android.synthetic.main.home_fragment_discover.view.*
+import kotlinx.android.synthetic.main.include_search_toolbar.view.*
 import kotlinx.android.synthetic.main.item_album_list.view.*
 import kotlinx.android.synthetic.main.item_playlist_list.view.*
-import kotlin.math.log
 
 class DiscoverFragment : AbstractLazyLoadFragment() {
 
@@ -39,7 +40,11 @@ class DiscoverFragment : AbstractLazyLoadFragment() {
     override fun initView(view: View) {
         view.apply {
             rv_recomend_playlists.apply {
-                adapter = Adapter(context, R.layout.item_playlist_list, recomendPlaylistList)
+                adapter = Adapter(context, R.layout.item_playlist_list, recomendPlaylistList).apply {
+                    setOnItemClickListener {
+                        PlaylistActivity.start( recomendPlaylistList[it].id, recomendPlaylistList[it].picUrl, activity!!)
+                    }
+                }
                 layoutManager = GridLayoutManager(context, 3)
                 itemAnimator = DefaultItemAnimator()
             }
@@ -55,6 +60,11 @@ class DiscoverFragment : AbstractLazyLoadFragment() {
                 layoutManager = LinearLayoutManager(context, LinearLayoutManager.HORIZONTAL, false)
                 itemAnimator = DefaultItemAnimator()
             }
+
+            et_search.setOnClickListener {
+                val intent = Intent(context, SearchActivity::class.java)
+                context.startActivity(intent)
+            }
         }
 
 
@@ -63,9 +73,7 @@ class DiscoverFragment : AbstractLazyLoadFragment() {
                 when (it.itemId) {
                     R.id.menu_discover_top_item_playlist -> {
                         (activity as AppCompatActivity).transaction {
-                            //                            replace(R.id.fl_discover_sub_container,
-//                                PlaylistSquareFragment()
-//                            )
+                            context.startActivity(Intent(context, MainPlaylistActivity::class.java))
                             addToBackStack(null)
                         }
                     }
@@ -136,7 +144,7 @@ class DiscoverFragment : AbstractLazyLoadFragment() {
 
     class Adapter<T>(context: Context, layoutID: Int, datas: List<T>) :
         BaseRecyclerViewAdapter<T>(context, layoutID, datas) {
-        override fun convert(holder: BaseViewHolder, data: T) {
+        override fun convert(holder: BaseViewHolder, data: T, position: Int) {
             when (data) {
                 is RecommendPlayList -> {
                     holder.itemView.apply {

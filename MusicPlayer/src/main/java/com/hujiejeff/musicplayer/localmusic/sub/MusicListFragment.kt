@@ -97,7 +97,7 @@ class MusicListFragment : AbstractLazyLoadFragment() {
 
     inner class MusicRecyclerViewAdapter :
         BaseRecyclerViewAdapter<Music>(context, R.layout.item_music_list, musicList) {
-        override fun convert(holder: BaseViewHolder, data: Music) {
+        override fun convert(holder: BaseViewHolder, data: Music, position: Int) {
             holder.itemView.apply {
                 tv_music_title.text = data.title
                 tv_music_artist.text = data.artist

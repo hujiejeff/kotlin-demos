@@ -84,7 +84,7 @@ class AlbumListFragment : AbstractLazyLoadFragment() {
 
     inner class AlbumRecycleViewAdapter :
         BaseRecyclerViewAdapter<Album>(context, R.layout.item_album_list, albumList) {
-        override fun convert(holder: BaseViewHolder, data: Album) {
+        override fun convert(holder: BaseViewHolder, data: Album, position: Int) {
             holder.itemView.apply {
                 album_title.text = data.title
                 album_artist.text = data.artist

@@ -1,4 +1,4 @@
-package com.hujiejeff.musicplayer.discover.sub
+package com.hujiejeff.musicplayer.discover.playlist
 
 import androidx.fragment.app.Fragment
 

@@ -1,7 +1,9 @@
 package com.hujiejeff.musicplayer.data.source.remote
 
 import com.hujiejeff.musicplayer.data.entity.*
+import okhttp3.ResponseBody
 import retrofit2.Call
+import retrofit2.Response
 import retrofit2.http.GET
 import retrofit2.http.Query
 
@@ -9,7 +11,7 @@ import retrofit2.http.Query
  * Create by hujie on 2020/1/8
  */
 
-const val baseUrl = "http://172.20.10.4:3000"
+const val baseUrl = "http://localhost:3000"
 
 interface Apis {
 
@@ -100,7 +102,7 @@ interface Apis {
      *  获取热搜榜
      * */
     @GET("search/hot")
-    fun getHotSerach()
+    fun getHotSerach(): Call<HotSearchResponse>
 
     /**
      *  搜索建议
@@ -117,6 +119,15 @@ interface Apis {
 
     @GET("/album/newest")
     fun getNewAlbum(): Call<RecommendNewAlbumResponse>
+
+
+    @GET("search")
+    fun getSearchResult(
+        @Query("keywords") keywords: String,
+        @Query("type") type: Int,
+        @Query("offset") offset: Int,
+        @Query("limit") limit: Int
+    ): Call<ResponseBody>
 
 
 }

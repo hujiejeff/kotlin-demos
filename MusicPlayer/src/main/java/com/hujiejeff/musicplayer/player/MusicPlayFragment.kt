@@ -27,7 +27,6 @@ class MusicPlayFragment : BaseFragment(), SeekBar.OnSeekBarChangeListener {
 
     private var isFirst = true
 
-    private lateinit var homeActivity: HomeActivity
     private lateinit var viewModel: PlayerViewModel
 
     override fun getLayoutId() = R.layout.fragment_music_play
@@ -86,7 +85,6 @@ class MusicPlayFragment : BaseFragment(), SeekBar.OnSeekBarChangeListener {
 
     override fun onAttach(context: Context) {
         super.onAttach(context)
-        homeActivity = context as HomeActivity
         viewModel = App.playerViewModel
         subscribe()
     }
@@ -125,28 +123,28 @@ class MusicPlayFragment : BaseFragment(), SeekBar.OnSeekBarChangeListener {
     private fun subscribe() {
         viewModel.apply {
             //music change
-            currentMusic.observe(homeActivity, Observer {
+            currentMusic.observe(this@MusicPlayFragment, Observer {
                 view?.updateUI(it)
             })
 
             //music state
-            isPlay.observe(homeActivity, Observer {
+            isPlay.observe(this@MusicPlayFragment, Observer {
                 view?.iv_play_btn_play?.isSelected = it
             })
 
             //music progress
-            playProgress.observe(homeActivity, Observer {progress ->
+            playProgress.observe(this@MusicPlayFragment, Observer {progress ->
                 view?.seek_bar?.progress = progress
                 view?.tv_current_time?.text = getMusicTimeFormatString(progress)
             })
 
             //music buffer progress
-            bufferProgress.observe(homeActivity, Observer {bufferProgress->
+            bufferProgress.observe(this@MusicPlayFragment, Observer {bufferProgress->
                 view?.seek_bar?.secondaryProgress = bufferProgress
             })
 
             //music mode
-            playMode.observe(homeActivity, Observer {
+            playMode.observe(this@MusicPlayFragment, Observer {
                 when (it) {
                     PlayMode.SINGLE, PlayMode.LOOP, PlayMode.SINGLE_LOOP -> {
                         view?.iv_play_mode_loop?.setImageLevel(it.value)
@@ -161,11 +159,11 @@ class MusicPlayFragment : BaseFragment(), SeekBar.OnSeekBarChangeListener {
                 }
             })
 
-            position.observe(homeActivity, Observer { index->
+            position.observe(this@MusicPlayFragment, Observer { index->
                 view?.play_view_pager?.setCurrentItem(index, true)
             })
 
-            musicItems.observe(homeActivity, Observer { list ->
+            musicItems.observe(this@MusicPlayFragment, Observer { list ->
                 fragmentList.clear()
                 list.forEach { music ->
                     val src = if (music.type == 0) getLocalCoverUrl(music.albumID) else music.coverSrc

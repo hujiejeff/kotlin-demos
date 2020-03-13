@@ -1,16 +1,15 @@
 package com.hujiejeff.musicplayer.data.source
 
 import com.hujiejeff.musicplayer.data.entity.*
-import com.hujiejeff.musicplayer.data.source.local.LocalMusicDataSource
-import com.hujiejeff.musicplayer.data.source.remote.NetMusicDataSource
-import java.util.*
+import com.hujiejeff.musicplayer.discover.search.SearchType
+import com.hujiejeff.musicplayer.util.logD
 
 /**
  * Create by hujie on 2020/1/3
  */
 class DataRepository(
-    private val localMusicDataSource: LocalMusicDataSource,
-    private val netMusicDataSource: NetMusicDataSource
+    private val localDataSource: LocalDataSource,
+    private val netDataSource: NetDataSource
 ) : LocalDataSource {
 
     private val cacheMusicList: MutableList<Music> = mutableListOf()
@@ -21,7 +20,7 @@ class DataRepository(
     private val cacheSubCats: MutableList<SubCat> = mutableListOf()
 
     private val cachePlayListMap: MutableMap<String, List<PlayList>> = mutableMapOf()
-    private  var cachePlayListDetail: PlayListDetail? = null
+    private var cachePlayListDetail: PlayListDetail? = null
 
     private var cacheIsDirty: Boolean = false
     override fun getLocalMusicList(callback: Callback<List<Music>>) {
@@ -30,7 +29,7 @@ class DataRepository(
             return
         }
 
-        localMusicDataSource.getLocalMusicList(object : Callback<List<Music>> {
+        localDataSource.getLocalMusicList(object : Callback<List<Music>> {
             override fun onLoaded(dataList: List<Music>) {
                 cacheMusicList.addAll(dataList)
                 callback.onLoaded(cacheMusicList)
@@ -48,7 +47,7 @@ class DataRepository(
             return
         }
 
-        localMusicDataSource.getLocalAlbumList(object : Callback<List<Album>> {
+        localDataSource.getLocalAlbumList(object : Callback<List<Album>> {
             override fun onLoaded(dataList: List<Album>) {
                 cacheAlbumList.addAll(dataList)
                 callback.onLoaded(cacheAlbumList)
@@ -66,7 +65,7 @@ class DataRepository(
             return
         }
 
-        localMusicDataSource.getLocalArtistList(object : Callback<List<Artist>> {
+        localDataSource.getLocalArtistList(object : Callback<List<Artist>> {
             override fun onLoaded(dataList: List<Artist>) {
                 cacheArtistList.addAll(dataList)
                 callback.onLoaded(cacheArtistList)
@@ -79,13 +78,13 @@ class DataRepository(
     }
 
 
-    fun getParentCat(callback: Callback<List<String>>){
+    fun getParentCat(callback: Callback<List<String>>) {
         if (cacheParentCat.isNotEmpty()) {
             callback.onLoaded(cacheParentCat)
             return
         }
 
-        netMusicDataSource.loadPlayListCatList(object : Callback<PlayListCatlistResponse> {
+        netDataSource.loadPlayListCatList(object : Callback<PlayListCatlistResponse> {
             override fun onLoaded(t: PlayListCatlistResponse) {
                 val parentCat = t.categories.values.toList()
                 val subCats = t.sub
@@ -106,7 +105,7 @@ class DataRepository(
             return
         }
 
-        netMusicDataSource.loadPlayListCatList(object : Callback<PlayListCatlistResponse> {
+        netDataSource.loadPlayListCatList(object : Callback<PlayListCatlistResponse> {
             override fun onLoaded(t: PlayListCatlistResponse) {
                 val parentCat = t.categories.values.toList()
                 val subCats = t.sub
@@ -121,14 +120,14 @@ class DataRepository(
         })
     }
 
-    fun getPlayLists(cat: String, limit: Int, order: String, callback: Callback<List<PlayList>>){
+    fun getPlayLists(cat: String, limit: Int, order: String, callback: Callback<List<PlayList>>) {
         val playLists = cachePlayListMap[cat]
         if (playLists != null && playLists.isNotEmpty()) {
             callback.onLoaded(playLists)
             return
         }
 
-        netMusicDataSource.loadNormalPlayLists(cat, 10, "hot", object : Callback<PlayListsResponse> {
+        netDataSource.loadNormalPlayLists(cat, 10, "hot", object : Callback<PlayListsResponse> {
             override fun onLoaded(t: PlayListsResponse) {
                 val cat = t.cat
                 val playLists: List<PlayList> = t.playlists
@@ -152,7 +151,7 @@ class DataRepository(
             callback.onLoaded(cachePlayListDetail!!)
         }
 
-        netMusicDataSource.loadPlaylistDetail(id, object : Callback<PlayListDetailResponse>{
+        netDataSource.loadPlaylistDetail(id, object : Callback<PlayListDetailResponse> {
             override fun onLoaded(t: PlayListDetailResponse) {
                 cachePlayListDetail = t.playlist
                 callback.onLoaded(cachePlayListDetail!!)
@@ -165,7 +164,7 @@ class DataRepository(
     }
 
     fun getTrackDetail(id: Long, callback: Callback<TrackData>) {
-        netMusicDataSource.loadTrackDetail(id, object : Callback<TrackResponse> {
+        netDataSource.loadTrackDetail(id, object : Callback<TrackResponse> {
             override fun onLoaded(t: TrackResponse) {
                 callback.onLoaded(t.data[0])
             }
@@ -177,7 +176,7 @@ class DataRepository(
     }
 
     fun getRecommendPlaylists(limit: Int, callback: Callback<List<RecommendPlayList>>) {
-        netMusicDataSource.loadRecommendPlaylists(limit, object : Callback<RecommendPlayListResponse> {
+        netDataSource.loadRecommendPlaylists(limit, object : Callback<RecommendPlayListResponse> {
             override fun onLoaded(t: RecommendPlayListResponse) {
                 callback.onLoaded(t.result)
             }
@@ -189,7 +188,7 @@ class DataRepository(
     }
 
     fun getNewAlbums(count: Int, callback: Callback<List<RecommendNewAlbum>>) {
-        netMusicDataSource.loadRecommendNewAlbum(object : Callback<RecommendNewAlbumResponse> {
+        netDataSource.loadRecommendNewAlbum(object : Callback<RecommendNewAlbumResponse> {
             override fun onLoaded(t: RecommendNewAlbumResponse) {
                 callback.onLoaded(t.albums.take(count))
             }
@@ -201,7 +200,7 @@ class DataRepository(
     }
 
     fun getNewSongs(count: Int, callback: Callback<List<RecommendNewSong>>) {
-        netMusicDataSource.loadRecommendNewSong(object : Callback<RecommendNewSongResponse> {
+        netDataSource.loadRecommendNewSong(object : Callback<RecommendNewSongResponse> {
             override fun onLoaded(t: RecommendNewSongResponse) {
                 callback.onLoaded(t.result.take(count))
             }
@@ -211,5 +210,165 @@ class DataRepository(
             }
         })
     }
+
+    override fun getSearchHistorySet(callback: Callback<Set<String>>) {
+        localDataSource.getSearchHistorySet(object : Callback<Set<String>> {
+            override fun onLoaded(t: Set<String>) {
+                callback.onLoaded(t)
+            }
+
+            override fun onFailed(mes: String) {
+            }
+        })
+    }
+
+    override fun saveSearchHistorySet(historySet: Set<String>) {
+        localDataSource.saveSearchHistorySet(historySet)
+    }
+
+    fun loadHotSearchStrings(callback: Callback<List<HotSearchString>>) {
+        netDataSource.loadHotSearchStrings(object : Callback<HotSearchResponse> {
+            override fun onLoaded(t: HotSearchResponse) {
+                callback.onLoaded(t.result.hots)
+            }
+
+            override fun onFailed(mes: String) {
+                callback.onFailed(mes)
+            }
+
+        })
+    }
+
+    fun <T, K> loadSearchResult(
+        type: SearchType,
+        keywords: String,
+        offset: Int,
+        limit: Int,
+        cls: Class<K>,
+        callback: Callback<List<T>>
+    ) {
+        logD("loadSearchResult2")
+
+        netDataSource.loadSearchResult(keywords, type.value, offset,limit, cls, object : Callback<K> {
+            override fun onLoaded(t: K) {
+
+                when (t) {
+                    is SearchSongResultResponse -> {
+                        callback.onLoaded(t.result.songs as List<T>)
+                    }
+
+                    is SearchArtistResultResponse -> {
+                        callback.onLoaded(t.result.artists as List<T>)
+                    }
+
+                    is SearchAlbumResultResponse -> {
+                        callback.onLoaded(t.result.albums as List<T>)
+                    }
+
+                    is SearchPlayListResultResponse -> {
+                        callback.onLoaded(t.result.playlists as List<T>)
+                    }
+
+                    is SearchUserResultResponse -> {
+                        callback.onLoaded(t.result.userprofiles as List<T>)
+                    }
+
+                }
+            }
+
+            override fun onFailed(mes: String) {
+                callback.onFailed(mes)
+            }
+        })
+    }
+
+
+//    fun loadSearchSongResult(keywords: String, limit: Int, callback: Callback<List<SearchSong>>) {
+//        netDataSource.loadSearchResult(
+//            keywords,
+//            1,
+//            limit,
+//            object : Callback<SearchSongResultResponse> {
+//                override fun onLoaded(t: SearchSongResultResponse) {
+//                    callback.onLoaded(t.result.songs)
+//                }
+//
+//                override fun onFailed(mes: String) {
+//                    callback.onFailed(mes)
+//                }
+//            })
+//    }
+//
+//    fun loadSearchArtistResult(
+//        keywords: String,
+//        limit: Int,
+//        callback: Callback<List<SearchArtist>>
+//    ) {
+//        netDataSource.loadSearchResult(
+//            keywords,
+//            100,
+//            limit,
+//            object : Callback<SearchArtistResultResponse> {
+//                override fun onLoaded(t: SearchArtistResultResponse) {
+//                    callback.onLoaded(t.result.artists)
+//                }
+//
+//                override fun onFailed(mes: String) {
+//                    callback.onFailed(mes)
+//                }
+//            })
+//    }
+//
+//    fun loadSearchAlbumResult(keywords: String, limit: Int, callback: Callback<List<SearchAlbum>>) {
+//        netDataSource.loadSearchResult(
+//            keywords,
+//            10,
+//            limit,
+//            object : Callback<SearchAlbumResultResponse> {
+//                override fun onLoaded(t: SearchAlbumResultResponse) {
+//                    callback.onLoaded(t.result.albums)
+//                }
+//
+//                override fun onFailed(mes: String) {
+//                    callback.onFailed(mes)
+//                }
+//            })
+//    }
+//
+//    fun loadSearchPlayListResult(
+//        keywords: String,
+//        limit: Int,
+//        callback: Callback<List<SearchPlayList>>
+//    ) {
+//        netDataSource.loadSearchResult(
+//            keywords,
+//            1000,
+//            limit,
+//            object : Callback<SearchPlayListResultResponse> {
+//                override fun onLoaded(t: SearchPlayListResultResponse) {
+//                    callback.onLoaded(t.result.playlists)
+//                }
+//
+//                override fun onFailed(mes: String) {
+//                    callback.onFailed(mes)
+//                }
+//            })
+//    }
+//
+//    fun loadSearchUserResult(keywords: String, limit: Int, callback: Callback<List<SearchUser>>) {
+//        netDataSource.loadSearchResult(
+//            keywords,
+//            1002,
+//            limit,
+//            object : Callback<SearchUserResultResponse> {
+//                override fun onLoaded(t: SearchUserResultResponse) {
+//                    callback.onLoaded(t.result.userprofiles)
+//                }
+//
+//                override fun onFailed(mes: String) {
+//                    callback.onFailed(mes)
+//                }
+//            })
+//    }
 
 }

@@ -1,16 +1,18 @@
-package com.hujiejeff.musicplayer.discover
+package com.hujiejeff.musicplayer.discover.playlistsqure
 
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
-import com.hujiejeff.musicplayer.base.App
 import com.hujiejeff.musicplayer.data.entity.PlayList
 import com.hujiejeff.musicplayer.data.entity.SubCat
 import com.hujiejeff.musicplayer.data.source.Callback
 import com.hujiejeff.musicplayer.data.source.DataRepository
 import com.hujiejeff.musicplayer.util.logD
 
-class PlaylistSquareViewModel(private val dataRepository: DataRepository): ViewModel() {
+/**
+ * Create by hujie on 2020/3/13
+ */
+class MainPlaylistViewModel(private val dataRepository: DataRepository): ViewModel() {
 
     //歌单分类
     private val _subCatList = MutableLiveData<List<SubCat>>().apply { value = mutableListOf() }
@@ -59,6 +61,5 @@ class PlaylistSquareViewModel(private val dataRepository: DataRepository): ViewM
             }
         })
     }
-
 
 }

@@ -1,9 +1,8 @@
-package com.hujiejeff.musicplayer.discover
+package com.hujiejeff.musicplayer.discover.playlist
 
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
-import com.hujiejeff.musicplayer.base.App
 import com.hujiejeff.musicplayer.data.entity.PlayListDetail
 import com.hujiejeff.musicplayer.data.source.Callback
 import com.hujiejeff.musicplayer.data.source.DataRepository

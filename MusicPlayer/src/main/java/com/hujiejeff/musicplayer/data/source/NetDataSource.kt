@@ -13,7 +13,12 @@ interface NetDataSource {
     fun loadPlayListCatList(callback: Callback<PlayListCatlistResponse>)
 
     //获取普通歌单响应
-    fun loadNormalPlayLists(cat: String, limit: Int, order: String, callback: Callback<PlayListsResponse>)
+    fun loadNormalPlayLists(
+        cat: String,
+        limit: Int,
+        order: String,
+        callback: Callback<PlayListsResponse>
+    )
 
     //获取歌单详情响应
     fun loadPlaylistDetail(id: Long, callback: Callback<PlayListDetailResponse>)
@@ -29,5 +34,18 @@ interface NetDataSource {
 
     //首页最新歌曲
     fun loadRecommendNewSong(callback: Callback<RecommendNewSongResponse>)
+
+    //热搜词
+    fun loadHotSearchStrings(callback: Callback<HotSearchResponse>)
+
+    //搜搜索
+    fun <T> loadSearchResult(
+        keywords: String,
+        type: Int,
+        offset: Int,
+        limit: Int,
+        cls: Class<T>,
+        callback: Callback<T>
+    )
 
 }

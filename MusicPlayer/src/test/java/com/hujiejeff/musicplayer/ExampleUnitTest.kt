@@ -1,7 +1,11 @@
 package com.hujiejeff.musicplayer
 
 import android.app.Activity
+import com.google.gson.Gson
+import com.google.gson.reflect.TypeToken
+import com.hujiejeff.musicplayer.data.entity.SearchSongResultResponse
 import com.hujiejeff.musicplayer.data.source.remote.Apis
+import com.hujiejeff.musicplayer.util.logD
 import okhttp3.*
 import org.junit.Test
 
@@ -9,6 +13,9 @@ import org.junit.Assert.*
 import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
 import java.io.IOException
+import android.icu.lang.UCharacter.GraphemeClusterBreak.T
+import java.lang.reflect.ParameterizedType
+
 
 /**
  * Example local unit test, which will execute on the development machine (host).
@@ -55,6 +62,47 @@ class ExampleUnitTest {
     fun testGetRecommendNewAlbum(){
         val response = getRetrofitApis().getNewAlbum().execute()
         println(response.body().toString())
+    }
+
+    @Test
+    fun testHotSearch(){
+        val response = getRetrofitApis().getHotSerach().execute()
+        println(response.body().toString())
+    }
+
+    @Test
+    fun testResponseBody() {
+        val re = getRetrofitApis().getSearchResult("天下", 1, 0, 10).execute()
+
+        val t =
+            Gson().fromJson<SearchSongResultResponse>(re.body().string(), object : TypeToken<SearchSongResultResponse>(){}.type)
+        println("loadSearchResult $t")
+        //todo 更新API的版本
+    }
+
+    @Test
+    fun testR() {
+        test(SearchSongResultResponse::class.java)
+    }
+
+    private fun <T> test(clazz: Class<T>) {
+
+        val re = getRetrofitApis().getSearchResult("天下", 1, 0, 10).execute()
+        println(clazz.toString())
+        val t =
+            Gson().fromJson(re.body().string(), clazz)
+        println("loadSearchResult $t")
+    }
+
+    @Test
+    fun tstGen() {
+
+    }
+
+    private fun <T> testGen2(clazz: Class<T>) {
+        val parametclass = clazz.genericSuperclass as ParameterizedType?
+        val actualTypeArguments = parametclass!!.getActualTypeArguments()
+//        clazz = actualTypeArguments[0] as Class<T>
     }
 
 

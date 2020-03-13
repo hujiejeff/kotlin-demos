@@ -2,9 +2,9 @@ package com.hujiejeff.musicplayer
 
 import android.content.Context
 import com.hujiejeff.musicplayer.data.source.DataRepository
-import com.hujiejeff.musicplayer.data.source.local.LocalMusicDataSource
+import com.hujiejeff.musicplayer.data.source.local.LocalDataSourceImpl
 import com.hujiejeff.musicplayer.data.source.remote.Apis
-import com.hujiejeff.musicplayer.data.source.remote.NetMusicDataSource
+import com.hujiejeff.musicplayer.data.source.remote.NetDataSourceImpl
 import com.hujiejeff.musicplayer.data.source.remote.baseUrl
 import com.hujiejeff.musicplayer.component.AppExecutors
 import retrofit2.Retrofit
@@ -14,8 +14,8 @@ object Injection {
     val appExecutors = AppExecutors()
     fun provideDataRepository(context: Context): DataRepository {
         return DataRepository(
-            LocalMusicDataSource(appExecutors),
-            NetMusicDataSource(provideRetrofitApis(), appExecutors)
+            LocalDataSourceImpl(appExecutors),
+            NetDataSourceImpl(provideRetrofitApis(), appExecutors)
         )
     }
 

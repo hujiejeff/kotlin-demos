@@ -1,4 +1,4 @@
-package com.hujiejeff.musicplayer.discover.sub
+package com.hujiejeff.musicplayer.discover.playlistsqure
 
 /**
  * desc：歌单分类

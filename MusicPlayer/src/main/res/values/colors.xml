@@ -7,5 +7,7 @@
     <color name="white">#fff</color>
     <color name="whiteTransparent">#10000000</color>
     <color name="bottomNavBackground">#FFFFFF</color>
+    <color name="gray">#eee</color>
+    <color name="blue">#0078D4</color>
     <drawable name="nav_btm_color">#000000</drawable>
 </resources>

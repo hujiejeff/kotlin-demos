@@ -1,15 +1,18 @@
 package com.hujiejeff.musicplayer.data.source.remote
 
+import com.google.gson.Gson
+import com.google.gson.reflect.TypeToken
 import com.hujiejeff.musicplayer.data.entity.*
 import com.hujiejeff.musicplayer.data.source.Callback
 import com.hujiejeff.musicplayer.data.source.NetDataSource
 import com.hujiejeff.musicplayer.component.AppExecutors
+import com.hujiejeff.musicplayer.util.logD
 
 
 /**
  * Create by hujie on 2020/1/3
  */
-class NetMusicDataSource(
+class NetDataSourceImpl(
     private val apis: Apis,
     private val appExecutors: AppExecutors
 ) : NetDataSource {
@@ -119,6 +122,43 @@ class NetMusicDataSource(
                 } else {
                     callback.onFailed(response.errorBody().string())
                 }
+            }
+        }
+    }
+
+    override fun loadHotSearchStrings(callback: Callback<HotSearchResponse>) {
+        networkIOExecute {
+            val response = apis.getHotSerach().execute()
+            mainThreadExecute {
+                if (response.isSuccessful && response.body().code == 200) {
+                    callback.onLoaded(response.body())
+                } else {
+                    callback.onFailed(response.errorBody().string())
+                }
+            }
+        }
+    }
+
+    override fun <T> loadSearchResult(
+        keywords: String,
+        type: Int,
+        offset: Int,
+        limit: Int,
+        cls: Class<T>,
+        callback: Callback<T>
+    ) {
+        logD("loadSearchResult3")
+        networkIOExecute {
+            val response = apis.getSearchResult(keywords, type, offset, limit).execute()
+            if (response.isSuccessful) {
+
+                val t =
+                    Gson().fromJson<T>(response.body().string(), cls)//todo 这种方式转对象，new TypeToken<List<T>>直接转list
+                mainThreadExecute {
+                    callback.onLoaded(t)
+                }
+            } else {
+                callback.onFailed(response.errorBody().string())
             }
         }
     }

@@ -2,6 +2,7 @@ package com.hujiejeff.musicplayer.base
 
 import android.content.Context
 import android.view.LayoutInflater
+import android.view.View
 import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
 
@@ -29,11 +30,11 @@ abstract class BaseRecyclerViewAdapter<T>(
                 mItemLongClick!!.invoke(position)
             }
         }
-        convert(holder, data)
+        convert(holder, data, position)
     }
 
     override fun getItemCount() = dataList.size
-    abstract fun convert(holder: BaseViewHolder, data: T)
+    abstract fun convert(holder: BaseViewHolder, data: T, position: Int)
     fun setOnItemClickListener(itemClick: (position: Int) -> Unit) {
         mItemClick = itemClick
     }

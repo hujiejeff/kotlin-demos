@@ -85,7 +85,7 @@ class ArtistListFragment : AbstractLazyLoadFragment() {
 
     inner class ArtistRecycleViewAdapter :
         BaseRecyclerViewAdapter<Artist>(context, R.layout.item_artist_list, artistList) {
-        override fun convert(holder: BaseViewHolder, data: Artist) {
+        override fun convert(holder: BaseViewHolder, data: Artist, position: Int) {
             holder.itemView.apply {
                 artist_cover.setImageBitmap(getArtistCover())
                 artist_name.text = data.name

@@ -11,5 +11,7 @@ interface LocalDataSource {
     fun getLocalMusicList(callback: Callback<List<Music>>)
     fun getLocalAlbumList(callback: Callback<List<Album>>)
     fun getLocalArtistList(callback: Callback<List<Artist>>)
+    fun getSearchHistorySet(callback: Callback<Set<String>>)
+    fun saveSearchHistorySet(historySet: Set<String>)
 
 }

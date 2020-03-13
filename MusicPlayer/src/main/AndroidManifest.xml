@@ -28,6 +28,9 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
+        <activity android:name=".discover.search.SearchActivity" />
+        <activity android:name=".discover.playlistsqure.MainPlaylistActivity" />
+        <activity android:name=".discover.playlist.PlaylistActivity" />
 
         <service android:name=".service.PlayService" />
     </application>

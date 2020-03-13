@@ -6,6 +6,7 @@ import com.hujiejeff.musicplayer.data.entity.Music
 import com.hujiejeff.musicplayer.data.source.Callback
 import com.hujiejeff.musicplayer.data.source.LocalDataSource
 import com.hujiejeff.musicplayer.component.AppExecutors
+import com.hujiejeff.musicplayer.data.Preference
 import com.hujiejeff.musicplayer.util.getAlbumList
 import com.hujiejeff.musicplayer.util.getArtistList
 import com.hujiejeff.musicplayer.util.getMusicList
@@ -13,7 +14,8 @@ import com.hujiejeff.musicplayer.util.getMusicList
 /**
  * Create by hujie on 2020/1/3
  */
-class LocalMusicDataSource(val appExecutors: AppExecutors): LocalDataSource {
+class LocalDataSourceImpl(val appExecutors: AppExecutors): LocalDataSource {
+
     override fun getLocalMusicList(callback: Callback<List<Music>>) {
         appExecutors.diskIO.execute {
             Thread.sleep(3000) //模拟耗时操作
@@ -54,6 +56,14 @@ class LocalMusicDataSource(val appExecutors: AppExecutors): LocalDataSource {
                 }
             }
         }
+    }
+
+    override fun getSearchHistorySet(callback: Callback<Set<String>>) {
+        callback.onLoaded(Preference.searchHistory)
+    }
+
+    override fun saveSearchHistorySet(historySet: Set<String>) {
+        Preference.searchHistory = historySet
     }
 
 }

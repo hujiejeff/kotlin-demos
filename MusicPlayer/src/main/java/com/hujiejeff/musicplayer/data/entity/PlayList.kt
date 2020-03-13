@@ -75,3 +75,7 @@ data class RecommendNewSongResponse(val code: Int, val result: List<RecommendNew
 
 data class RecommendNewAlbum(val id: Long, val name: String, val picUrl: String, val artist: Ar)
 data class RecommendNewAlbumResponse(val code: Int, val albums: List<RecommendNewAlbum>)
+
+data class HotSearchString(val first: String)
+data class HotSearchResult(val hots: List<HotSearchString>)
+data class HotSearchResponse(val code: Int, val result: HotSearchResult)

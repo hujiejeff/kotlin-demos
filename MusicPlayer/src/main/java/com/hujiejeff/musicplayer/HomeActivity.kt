@@ -26,31 +26,23 @@ import kotlinx.android.synthetic.main.activity_home.*
 
 class HomeActivity : BaseActivity() {
     override fun layoutResId(): Int = R.layout.activity_home
+    override fun isLightStatusBar(): Boolean = true
 
-    private val fragments = arrayListOf<Fragment>(
+    private val fragments = arrayListOf(
         DiscoverFragment(),
         LocalMusicFragment(), VideoFragment()
     )
     private var preIndex: Int = 0
 
-    private val musicPlayFragment by lazy { MusicPlayFragment() }
-    private var isAddMusicPlay = false
-    private var isShowMusicPlay = false
-
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        setContentView(R.layout.activity_home)
         initView()
         bindService()
         initClickListener()
-        subscribe()
     }
 
     private fun initView() {
         loadFragment(0)
-        checkAndroidVersionAction(Build.VERSION_CODES.M, {
-            window.setTransparentStatusBar(true)
-        })
     }
 
     private fun bindService() {
@@ -76,58 +68,9 @@ class HomeActivity : BaseActivity() {
             true
         }
 
-        ppv_player.setOnClickListener {
-            App.playerViewModel.showOrHidePlayFragment()
-        }
+
     }
 
-    private fun subscribe() {
-        App.playerViewModel.apply {
-            currentMusic.observe(this@HomeActivity,
-                Observer<Music> { music ->
-                    ppv_player.max = music.duration.toInt()
-                    ppv_player.progress = if (!isPlay.value!!) Preference.play_progress else 0
-
-                    if (music.type == 1) {
-                        ppv_player.setSrc(music.coverSrc!!)
-                    } else {
-                        ppv_player.setBitmap(getCover(music.albumID))
-                    }
-                })
-
-            playProgress.observe(this@HomeActivity, Observer<Int> { progress ->
-                ppv_player.progress = progress
-            })
-
-            isPlayFragmentShow.observe(this@HomeActivity, Observer {isShow ->
-                if (isShow) {
-                    openMusicPlayFragment()
-                } else {
-                    hideMusicPlayFragment()
-                }
-            })
-        }
-    }
-
-    private fun openMusicPlayFragment() {
-        transaction {
-            if (!isAddMusicPlay) {
-                add(android.R.id.content, musicPlayFragment)
-                isAddMusicPlay = true
-            }
-            setCustomAnimations(R.anim.fragment_slide_up, 0)
-            show(musicPlayFragment)
-            isShowMusicPlay = true
-        }
-    }
-
-    private fun hideMusicPlayFragment() {
-        transaction {
-            setCustomAnimations(0, R.anim.fragment_slide_down)
-            hide(musicPlayFragment)
-            isShowMusicPlay = false
-        }
-    }
 
 
     private fun loadFragment(showIndex: Int) {
@@ -153,11 +96,5 @@ class HomeActivity : BaseActivity() {
         }
     }
 
-    override fun onBackPressed() {
-        if (isShowMusicPlay) {
-            App.playerViewModel.showOrHidePlayFragment()
-            return
-        }
-        super.onBackPressed()
-    }
+
 }

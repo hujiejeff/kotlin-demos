@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:paddingRight="10dp"
+    android:paddingLeft="10dp"
+    android:id="@+id/rl_search"
+    android:layout_width="match_parent"
+    android:layout_height="?attr/actionBarSize">
+
+    <EditText
+        android:id="@+id/et_search"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_centerInParent="true"
+        android:layout_marginEnd="20dp"
+        android:layout_marginStart="20dp"
+        android:background="@color/white"
+        android:hint="音乐、视频、歌词、电台"
+        android:paddingBottom="10dp"
+        android:paddingLeft="40dp"
+        android:paddingTop="10dp"
+        android:textSize="16sp"
+        android:transitionName="share_edit"/>
+
+    <ImageView
+        android:id="@+id/searchIv"
+        android:layout_width="15dp"
+        android:layout_height="15dp"
+        android:layout_centerVertical="true"
+        android:layout_marginLeft="35dp"
+        android:src="@drawable/ic_search"
+        android:transitionName="share_image" />
+    <com.hujiejeff.musicplayer.customview.PlayerProgressView
+
+        android:layout_alignParentRight="true"
+        android:layout_centerVertical="true"
+        android:layout_width="40dp"
+        android:layout_height="40dp"/>
+</RelativeLayout>
