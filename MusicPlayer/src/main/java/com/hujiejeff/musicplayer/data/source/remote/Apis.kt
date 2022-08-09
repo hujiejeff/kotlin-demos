@@ -11,7 +11,7 @@ import retrofit2.http.Query
  * Create by hujie on 2020/1/8
  */
 
-const val baseUrl = "http://localhost:3000"
+const val baseUrl = "https://netease-cloud-music-api-hujiejeff.vercel.app"
 
 interface Apis {
 
